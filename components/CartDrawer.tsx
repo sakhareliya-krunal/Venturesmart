@@ -59,7 +59,7 @@ export function CartDrawer() {
             </div>
           </div>
         ) : (
-          <>
+          <div className="cart-body">
             <div className="cart-items">
               {cart.map((item) => (
                 <div className="cart-item" key={item.id}>
@@ -123,7 +123,7 @@ export function CartDrawer() {
                 </span>
               </div>
             </div>
-          </>
+          </div>
         )}
       </aside>
 

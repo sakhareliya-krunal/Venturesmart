@@ -17,6 +17,7 @@ import {
   ZoomIn
 } from "lucide-react";
 import { useRef, useState, type CSSProperties } from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSplitColumnScroll } from "@/hooks/useSplitColumnScroll";
 import { formatPrice, getProductVariants, products, type Product } from "@/lib/products";
 import { useRouteTransition } from "./PageTransition";
@@ -39,6 +40,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const gallery = product.gallery.length > 0 ? product.gallery : [product.image];
   const colorVariants = getProductVariants(product, products);
   const hasColorVariants = colorVariants.length > 1;
+  const isDesktopGallery = useMediaQuery("(min-width: 901px)");
 
   useSplitColumnScroll({
     containerRef: topRef,
@@ -63,47 +65,65 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     <section className="product-detail section page-section">
       <div className="product-detail-top" ref={topRef}>
         <div className="product-gallery-scroll" ref={galleryScrollRef}>
-          <div className="product-gallery-desktop" aria-hidden="true">
-            {gallery.map((image, index) => (
-              <div className="product-gallery-slide" key={`desktop-${image}-${index}`}>
-                <Image
-                  src={image}
-                  alt={index === 0 ? product.name : `${product.name} view ${index + 1}`}
-                  fill
-                  priority={index === 0}
-                  sizes="(max-width: 980px) 100vw, 50vw"
-                />
-                {index === 0 && <span>{product.tag}</span>}
-              </div>
-            ))}
-          </div>
-          <div className="product-gallery-mobile">
-            <div className="product-main-image">
-              <Image src={activeImage} alt={product.name} fill priority sizes="(max-width: 980px) 100vw, 50vw" />
-              <span>{product.tag}</span>
-              <button className="image-zoom-button" type="button" aria-label={`Zoom ${product.name}`}>
-                <ZoomIn size={18} />
-                Quick zoom
-              </button>
-            </div>
-            <div className="product-thumbnail-row" aria-label="Product highlights">
+          {isDesktopGallery ? (
+            <div className="product-gallery-desktop">
               {gallery.map((image, index) => (
-                <button
-                  className={activeImageIndex === index ? "product-thumbnail active" : "product-thumbnail"}
-                  key={`${image}-${index}`}
-                  onClick={() => {
-                    setActiveImage(image);
-                    setActiveImageIndex(index);
-                  }}
-                  type="button"
-                  aria-label={`View product image ${index + 1}`}
-                >
-                  <Image src={image} alt="" fill sizes="96px" />
-                  {index > 0 && <ImagePlus size={16} />}
-                </button>
+                <div className="product-gallery-slide" key={`desktop-${image}-${index}`}>
+                  <Image
+                    src={image}
+                    alt={index === 0 ? product.name : `${product.name} view ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    loading={index === 0 ? undefined : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    sizes="(max-width: 980px) 100vw, 50vw"
+                  />
+                  {index === 0 && <span>{product.tag}</span>}
+                </div>
               ))}
             </div>
-          </div>
+          ) : (
+            <div className="product-gallery-mobile">
+              <div className="product-main-image">
+                <Image
+                  src={activeImage}
+                  alt={product.name}
+                  fill
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 980px) 100vw, 50vw"
+                />
+                <span>{product.tag}</span>
+                <button className="image-zoom-button" type="button" aria-label={`Zoom ${product.name}`}>
+                  <ZoomIn size={18} />
+                  Quick zoom
+                </button>
+              </div>
+              <div className="product-thumbnail-row" aria-label="Product highlights">
+                {gallery.map((image, index) => (
+                  <button
+                    className={activeImageIndex === index ? "product-thumbnail active" : "product-thumbnail"}
+                    key={`${image}-${index}`}
+                    onClick={() => {
+                      setActiveImage(image);
+                      setActiveImageIndex(index);
+                    }}
+                    type="button"
+                    aria-label={`View product image ${index + 1}`}
+                  >
+                    <Image
+                      src={image}
+                      alt=""
+                      fill
+                      loading={index === 0 ? undefined : "lazy"}
+                      sizes="96px"
+                    />
+                    {index > 0 && <ImagePlus size={16} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="gallery-note">
             <BadgeCheck size={18} />
             <span>Gallery images show the selected product and its matching detail views.</span>
