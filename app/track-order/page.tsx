@@ -1,0 +1,27 @@
+import { InnerHero } from "@/components/InnerHero";
+import { TrackOrderClient } from "@/components/TrackOrderClient";
+
+export const metadata = {
+  title: "Track Order | Ventures Mart"
+};
+
+type TrackOrderPageProps = {
+  searchParams: Promise<{ order?: string }>;
+};
+
+export default async function TrackOrderPage({ searchParams }: TrackOrderPageProps) {
+  const params = await searchParams;
+
+  return (
+    <main>
+      <InnerHero
+        eyebrow="Support"
+        title="Track order"
+        description="Look up demo orders placed in this browser using your order ID and contact details."
+      />
+      <section className="section page-section">
+        <TrackOrderClient initialOrderId={params.order ?? ""} />
+      </section>
+    </main>
+  );
+}
