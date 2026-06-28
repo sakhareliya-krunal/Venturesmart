@@ -24,17 +24,36 @@ const revealSelector = [
   ".footer-bottom"
 ].join(",");
 
+const catalogPaths = ["/shop", "/favourites"];
+
+function isCatalogPath(pathname: string) {
+  return catalogPaths.includes(pathname) || pathname.startsWith("/categories/");
+}
+
 export function ScrollAnimations() {
   const pathname = usePathname();
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const catalogPage = isCatalogPath(pathname);
     const elements = Array.from(document.querySelectorAll<HTMLElement>(revealSelector));
 
     elements.forEach((element, index) => {
       element.classList.add("reveal");
       element.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 55}ms`);
     });
+
+    if (catalogPage) {
+      const catalogRoot = document.getElementById("catalog-products") ?? document.getElementById("page-content");
+
+      if (catalogRoot) {
+        catalogRoot.querySelectorAll<HTMLElement>(
+          ".section-heading, .section-heading-compact, .catalog-controls, .shop-toolbar, .product-card, .empty-results"
+        ).forEach((element) => {
+          element.classList.add("visible");
+        });
+      }
+    }
 
     if (prefersReducedMotion) {
       elements.forEach((element) => element.classList.add("visible"));
@@ -60,7 +79,7 @@ export function ScrollAnimations() {
 
     let autoScrollTimer: number | undefined;
 
-    if (pathname !== "/") {
+    if (pathname !== "/" && !catalogPage) {
       const target =
         document.getElementById("catalog-products") ?? document.getElementById("page-content");
 

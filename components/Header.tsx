@@ -1,12 +1,13 @@
 "use client";
 
-import { ChevronDown, Menu, ShoppingBag, X } from "lucide-react";
+import { ChevronDown, Heart, Menu, ShoppingBag, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { categoryPages } from "@/lib/products";
 import { setScrollLock } from "@/lib/scroll-lock";
 import { useCart } from "./CartProvider";
+import { useFavourites } from "./FavouritesProvider";
 import { TransitionLink } from "./TransitionLink";
 
 function isDesktopNav() {
@@ -18,27 +19,28 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [categoryHovered, setCategoryHovered] = useState(false);
-  const [categoryDismissed, setCategoryDismissed] = useState(false);
   const categoryRef = useRef<HTMLDivElement>(null);
   const { cartCount, setCartOpen } = useCart();
+  const { favouriteCount } = useFavourites();
 
-  const categoryExpanded = isDesktopNav()
-    ? !categoryDismissed && categoryHovered
-    : categoryOpen;
+  const categoryExpanded = isDesktopNav() ? categoryHovered : categoryOpen;
 
-  const closeNav = () => {
+  const resetNavOnRouteChange = () => {
     setMenuOpen(false);
     setCategoryOpen(false);
     setCategoryHovered(false);
-    setCategoryDismissed(true);
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
   };
 
+  const closeNav = () => {
+    resetNavOnRouteChange();
+  };
+
   useEffect(() => {
-    closeNav();
+    resetNavOnRouteChange();
   }, [pathname]);
 
   useEffect(() => {
@@ -71,7 +73,6 @@ export function Header() {
 
       setCategoryOpen(false);
       setCategoryHovered(false);
-      setCategoryDismissed(false);
     };
 
     if (!categoryExpanded) {
@@ -98,15 +99,8 @@ export function Header() {
           <div
             ref={categoryRef}
             className={categoryExpanded ? "nav-item-has-dropdown open" : "nav-item-has-dropdown"}
-            onMouseEnter={() => {
-              if (!categoryDismissed) {
-                setCategoryHovered(true);
-              }
-            }}
-            onMouseLeave={() => {
-              setCategoryHovered(false);
-              setCategoryDismissed(false);
-            }}
+            onMouseEnter={() => setCategoryHovered(true)}
+            onMouseLeave={() => setCategoryHovered(false)}
           >
             <button
               type="button"
@@ -118,7 +112,6 @@ export function Header() {
 
                 if (isDesktopNav()) {
                   if (categoryExpanded) {
-                    setCategoryDismissed(true);
                     setCategoryHovered(false);
                   }
                   return;
@@ -167,6 +160,11 @@ export function Header() {
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+          <TransitionLink className="favourites-button" href="/favourites" aria-label="View favourites">
+            <Heart size={20} />
+            <span>Favourites</span>
+            {favouriteCount > 0 && <strong>{favouriteCount}</strong>}
+          </TransitionLink>
           <button className="cart-button" onClick={() => setCartOpen(true)} aria-label="Open cart">
             <ShoppingBag size={20} />
             <span>Cart</span>

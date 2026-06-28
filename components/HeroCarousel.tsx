@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { heroSlides } from "@/lib/hero-slides";
 import { TransitionLink } from "./TransitionLink";
 
@@ -45,6 +45,35 @@ export function HeroCarousel() {
     return () => window.clearInterval(intervalId);
   }, [goNext, paused, reducedMotion]);
 
+  const handleSwipeStart = (event: PointerEvent<HTMLDivElement>) => {
+    touchStartX.current = event.clientX;
+    touchStartY.current = event.clientY;
+  };
+
+  const handleSwipeEnd = (event: PointerEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null || touchStartY.current === null) {
+      return;
+    }
+
+    const diffX = event.clientX - touchStartX.current;
+    const diffY = event.clientY - touchStartY.current;
+
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX < 0) {
+        goNext();
+      } else {
+        goPrev();
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  const stopSwipePropagation = (event: PointerEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
+
   return (
     <section
       className="hero-carousel"
@@ -53,29 +82,6 @@ export function HeroCarousel() {
       aria-label="Featured promotions"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onPointerDown={(event) => {
-        touchStartX.current = event.clientX;
-        touchStartY.current = event.clientY;
-      }}
-      onPointerUp={(event) => {
-        if (touchStartX.current === null || touchStartY.current === null) {
-          return;
-        }
-
-        const diffX = event.clientX - touchStartX.current;
-        const diffY = event.clientY - touchStartY.current;
-
-        if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-          if (diffX < 0) {
-            goNext();
-          } else {
-            goPrev();
-          }
-        }
-
-        touchStartX.current = null;
-        touchStartY.current = null;
-      }}
     >
       <div className="hero-carousel-track">
         {heroSlides.map((slide, index) => (
@@ -84,7 +90,11 @@ export function HeroCarousel() {
             className={index === activeIndex ? "hero-slide active" : "hero-slide"}
             aria-hidden={index !== activeIndex}
           >
-            <div className="hero-slide-media">
+            <div
+              className="hero-slide-media"
+              onPointerDown={handleSwipeStart}
+              onPointerUp={handleSwipeEnd}
+            >
               <Image
                 src={slide.image}
                 alt=""
@@ -94,7 +104,11 @@ export function HeroCarousel() {
               />
               <div className="hero-slide-overlay" aria-hidden="true" />
             </div>
-            <div className="hero-slide-copy">
+            <div
+              className="hero-slide-copy"
+              onPointerDown={stopSwipePropagation}
+              onPointerUp={stopSwipePropagation}
+            >
               <p className="eyebrow">{slide.eyebrow}</p>
               <h1>{slide.title}</h1>
               <p>{slide.description}</p>

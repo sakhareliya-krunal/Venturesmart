@@ -30,6 +30,7 @@ export function Footer() {
           <h3>Shop</h3>
           <TransitionLink href="/categories/toys">Toys</TransitionLink>
           <TransitionLink href="/categories/lunch-box">Lunch Box</TransitionLink>
+          <TransitionLink href="/favourites">Favourites</TransitionLink>
         </div>
 
         <div className="footer-column">

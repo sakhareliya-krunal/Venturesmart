@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   BadgeCheck,
   Check,
-  Heart,
   ImagePlus,
   Minus,
   PackageCheck,
@@ -17,6 +16,7 @@ import {
   ZoomIn
 } from "lucide-react";
 import { useRef, useState, type CSSProperties } from "react";
+import { FavouriteButton } from "@/components/FavouriteButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSplitColumnScroll } from "@/hooks/useSplitColumnScroll";
 import { formatPrice, getProductVariants, products, type Product } from "@/lib/products";
@@ -94,6 +94,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   sizes="(max-width: 980px) 100vw, 50vw"
                 />
                 <span>{product.tag}</span>
+                <FavouriteButton className="product-favourite-corner" product={product} />
                 <button className="image-zoom-button" type="button" aria-label={`Zoom ${product.name}`}>
                   <ZoomIn size={18} />
                   Quick zoom
@@ -215,9 +216,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <button className="detail-buy-button" type="button" onClick={buyNow}>
                 Buy now
               </button>
-              <button className="detail-save-button" type="button" aria-label={`Save ${product.name}`}>
-                <Heart size={18} />
-              </button>
+              <FavouriteButton className="detail-save-button" product={product} />
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDownUp, Eye, GitCompare, Heart, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowDownUp, Eye, GitCompare, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   categories,
@@ -12,6 +12,7 @@ import {
   type ProductVariantGroup
 } from "@/lib/products";
 import { CustomDropdown } from "./CustomDropdown";
+import { FavouriteButton } from "./FavouriteButton";
 import { useCart } from "./CartProvider";
 import { TransitionLink } from "./TransitionLink";
 
@@ -201,11 +202,10 @@ function ProductCard({
           <span>{selectedProduct.tag}</span>
           <strong>{discount}% off</strong>
         </div>
+        <FavouriteButton className="product-favourite-corner" product={selectedProduct} />
         <div className="product-image-overlay" aria-hidden="true" />
         <div className="product-hover-actions">
-          <button aria-label={`Save ${selectedProduct.name}`} type="button">
-            <Heart size={18} />
-          </button>
+          <FavouriteButton product={selectedProduct} />
           <button className="compare-button" aria-label={`Compare ${selectedProduct.name}`} type="button">
             <GitCompare size={18} />
           </button>

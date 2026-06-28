@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CartProvider } from "@/components/CartProvider";
+import { FavouritesProvider } from "@/components/FavouritesProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { PageTransition, TransitionProvider } from "@/components/PageTransition";
@@ -33,13 +34,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <CartProvider>
-          <TransitionProvider>
-            <Header />
-            <PageTransition>{children}</PageTransition>
-            <Footer />
-            <CartDrawer />
-            <ScrollAnimations />
-          </TransitionProvider>
+          <FavouritesProvider>
+            <TransitionProvider>
+              <Header />
+              <PageTransition>{children}</PageTransition>
+              <Footer />
+              <CartDrawer />
+              <ScrollAnimations />
+            </TransitionProvider>
+          </FavouritesProvider>
         </CartProvider>
       </body>
     </html>
