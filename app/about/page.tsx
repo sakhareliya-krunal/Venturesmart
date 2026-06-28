@@ -1,5 +1,7 @@
 import { Check, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 import { InnerHero } from "@/components/InnerHero";
+import { PageContent } from "@/components/PageContent";
+import { defaultTrustStats } from "@/lib/page-trust-stats";
 
 export const metadata = {
   title: "Why Ventures Mart | Ventures Mart"
@@ -12,8 +14,9 @@ export default function AboutPage() {
         eyebrow="Why Ventures Mart"
         title="A focused store built around trust, clarity, and useful products."
         description="Ventures Mart focuses on creative toys, everyday lunch boxes, and a shopping flow customers can complete quickly."
+        stats={defaultTrustStats}
       />
-      <section className="section page-section">
+      <PageContent>
         <div className="content-grid">
           {[
             {
@@ -33,7 +36,9 @@ export default function AboutPage() {
             }
           ].map((item) => (
             <article className="info-card" key={item.title}>
-              <item.icon size={26} />
+              <div className="info-card-icon">
+                <item.icon size={26} />
+              </div>
               <h2>{item.title}</h2>
               <p>{item.text}</p>
             </article>
@@ -56,7 +61,7 @@ export default function AboutPage() {
             )}
           </div>
         </div>
-      </section>
+      </PageContent>
     </main>
   );
 }

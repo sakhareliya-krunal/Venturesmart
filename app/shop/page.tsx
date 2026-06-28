@@ -1,4 +1,5 @@
 import { InnerHero } from "@/components/InnerHero";
+import { PageContent } from "@/components/PageContent";
 import { ProductListing } from "@/components/ProductListing";
 import { TransitionLink } from "@/components/TransitionLink";
 import { categories, products } from "@/lib/products";
@@ -46,9 +47,9 @@ export default function ShopPage() {
           </div>
         </div>
       </InnerHero>
-      <section className="section page-section" id="catalog-products">
+      <PageContent id="catalog-products">
         <ProductListing items={products} />
-      </section>
+      </PageContent>
     </main>
   );
 }

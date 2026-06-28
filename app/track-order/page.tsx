@@ -1,5 +1,7 @@
 import { InnerHero } from "@/components/InnerHero";
+import { PageContent } from "@/components/PageContent";
 import { TrackOrderClient } from "@/components/TrackOrderClient";
+import { trackOrderTrustStats } from "@/lib/page-trust-stats";
 
 export const metadata = {
   title: "Track Order | Ventures Mart"
@@ -18,10 +20,11 @@ export default async function TrackOrderPage({ searchParams }: TrackOrderPagePro
         eyebrow="Support"
         title="Track order"
         description="Look up demo orders placed in this browser using your order ID and contact details."
+        stats={trackOrderTrustStats}
       />
-      <section className="section page-section">
+      <PageContent>
         <TrackOrderClient initialOrderId={params.order ?? ""} />
-      </section>
+      </PageContent>
     </main>
   );
 }

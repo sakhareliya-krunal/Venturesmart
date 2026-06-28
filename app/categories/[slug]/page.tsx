@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { InnerHero } from "@/components/InnerHero";
+import { PageContent } from "@/components/PageContent";
 import { ProductListing } from "@/components/ProductListing";
 import { categoryPages, getDisplayProducts, products } from "@/lib/products";
 
@@ -39,15 +40,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           { value: "Fast", label: "Dispatch" }
         ]}
       />
-      <section className="section page-section">
+      <PageContent>
         <ProductListing
           items={categoryProducts}
           heading={categoryPage.title}
           eyebrow="Category collection"
           searchable={false}
           showCategories={false}
+          showHeading={false}
         />
-      </section>
+      </PageContent>
     </main>
   );
 }

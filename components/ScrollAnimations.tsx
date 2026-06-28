@@ -5,11 +5,12 @@ import { useEffect } from "react";
 
 const revealSelector = [
   ".inner-hero",
-  ".premium-hero-content > *",
-  ".premium-hero-badge",
+  ".hero-carousel .hero-slide-copy > *",
   ".trust-strip > div",
   ".section-heading",
   ".section-action",
+  ".page-content-panel",
+  ".page-content-panel > *",
   ".product-card",
   ".feature-band > *",
   ".feature-list > div",
@@ -57,7 +58,25 @@ export function ScrollAnimations() {
 
     elements.forEach((element) => observer.observe(element));
 
-    return () => observer.disconnect();
+    let autoScrollTimer: number | undefined;
+
+    if (pathname !== "/") {
+      const target =
+        document.getElementById("catalog-products") ?? document.getElementById("page-content");
+
+      if (target) {
+        autoScrollTimer = window.setTimeout(() => {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 700);
+      }
+    }
+
+    return () => {
+      observer.disconnect();
+      if (autoScrollTimer !== undefined) {
+        window.clearTimeout(autoScrollTimer);
+      }
+    };
   }, [pathname]);
 
   return null;

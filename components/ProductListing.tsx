@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDownUp, GitCompare, Heart, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowDownUp, Eye, GitCompare, Heart, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   categories,
@@ -21,6 +21,7 @@ type ProductListingProps = {
   eyebrow?: string;
   searchable?: boolean;
   showCategories?: boolean;
+  showHeading?: boolean;
   initialCategory?: "All" | ProductCategory;
 };
 
@@ -30,6 +31,7 @@ export function ProductListing({
   eyebrow = "Curated collection",
   searchable = true,
   showCategories = true,
+  showHeading = true,
   initialCategory = "All"
 }: ProductListingProps) {
   const [activeCategory, setActiveCategory] = useState<typeof initialCategory>(initialCategory);
@@ -90,12 +92,27 @@ export function ProductListing({
 
   return (
     <>
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow dark">{eyebrow}</p>
-          <h2>{heading}</h2>
+      {showHeading && (
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow dark">{eyebrow}</p>
+            <h2>{heading}</h2>
+          </div>
+          {searchable && (
+            <label className="search-box">
+              <Search size={18} />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search products or category"
+              />
+            </label>
+          )}
         </div>
-        {searchable && (
+      )}
+
+      {!showHeading && searchable && (
+        <div className="section-heading section-heading-compact">
           <label className="search-box">
             <Search size={18} />
             <input
@@ -104,8 +121,8 @@ export function ProductListing({
               placeholder="Search products or category"
             />
           </label>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="catalog-controls">
         {showCategories && (
@@ -184,12 +201,25 @@ function ProductCard({
           <span>{selectedProduct.tag}</span>
           <strong>{discount}% off</strong>
         </div>
-        <button aria-label={`Save ${selectedProduct.name}`} type="button">
-          <Heart size={18} />
-        </button>
-        <button className="compare-button" aria-label={`Compare ${selectedProduct.name}`} type="button">
-          <GitCompare size={18} />
-        </button>
+        <div className="product-image-overlay" aria-hidden="true" />
+        <div className="product-hover-actions">
+          <button aria-label={`Save ${selectedProduct.name}`} type="button">
+            <Heart size={18} />
+          </button>
+          <button className="compare-button" aria-label={`Compare ${selectedProduct.name}`} type="button">
+            <GitCompare size={18} />
+          </button>
+          <TransitionLink href={`/products/${selectedProduct.slug}`} aria-label={`View ${selectedProduct.name}`}>
+            <Eye size={18} />
+          </TransitionLink>
+          <button
+            aria-label={`Add ${selectedProduct.name} to cart`}
+            onClick={() => onAddToCart(selectedProduct)}
+            type="button"
+          >
+            <ShoppingCart size={18} />
+          </button>
+        </div>
       </div>
       <div className="product-info">
         <div className="product-meta">

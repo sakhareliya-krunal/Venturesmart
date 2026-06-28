@@ -1,5 +1,7 @@
 import { BadgeIndianRupee, CreditCard, ShieldCheck } from "lucide-react";
 import { InnerHero } from "@/components/InnerHero";
+import { PageContent } from "@/components/PageContent";
+import { defaultTrustStats } from "@/lib/page-trust-stats";
 
 export const metadata = {
   title: "Payments | Ventures Mart"
@@ -12,11 +14,14 @@ export default function PaymentsPage() {
         eyebrow="Future integration"
         title="Best payment fit for India"
         description="Demo checkout is available for UI testing. Live Razorpay collection can be connected later."
+        stats={defaultTrustStats}
       />
-      <section className="section page-section">
+      <PageContent>
         <div className="payment-grid">
           <article className="payment-card recommended">
-            <BadgeIndianRupee size={28} />
+            <div className="payment-card-icon">
+              <BadgeIndianRupee size={28} />
+            </div>
             <h3>Razorpay</h3>
             <p>
               Recommended first because it supports common Indian payment modes, has strong web
@@ -25,7 +30,9 @@ export default function PaymentsPage() {
             <span>Use later: Standard Checkout + server-side order verification</span>
           </article>
           <article className="payment-card">
-            <CreditCard size={28} />
+            <div className="payment-card-icon">
+              <CreditCard size={28} />
+            </div>
             <h3>Cashfree or PayU</h3>
             <p>
               Good alternatives if pricing, settlement, onboarding, or support terms are better for
@@ -34,7 +41,9 @@ export default function PaymentsPage() {
             <span>Compare before launch: MDR, settlement time, refunds, support</span>
           </article>
           <article className="payment-card">
-            <ShieldCheck size={28} />
+            <div className="payment-card-icon">
+              <ShieldCheck size={28} />
+            </div>
             <h3>Recommended methods</h3>
             <p>
               Keep UPI, cards, net banking, wallets, and cash on delivery visible for India-only
@@ -43,7 +52,7 @@ export default function PaymentsPage() {
             <span>Demo checkout available now; live gateway later</span>
           </article>
         </div>
-      </section>
+      </PageContent>
     </main>
   );
 }

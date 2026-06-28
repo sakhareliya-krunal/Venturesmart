@@ -41,9 +41,22 @@ export function CartDrawer() {
 
         {cart.length === 0 ? (
           <div className="empty-cart">
-            <ShoppingBag size={34} />
-            <p>Your cart is empty.</p>
-            <button onClick={() => setCartOpen(false)}>Continue shopping</button>
+            <div className="empty-cart-content">
+              <div className="empty-cart-icon" aria-hidden="true">
+                <ShoppingBag size={32} />
+              </div>
+              <div className="empty-cart-copy">
+                <h3>Your cart is empty</h3>
+                <p>Browse toys and lunch boxes to add your first item.</p>
+              </div>
+              <TransitionLink
+                className="primary-link empty-cart-cta"
+                href="/shop"
+                onClick={() => setCartOpen(false)}
+              >
+                Continue shopping
+              </TransitionLink>
+            </div>
           </div>
         ) : (
           <>
