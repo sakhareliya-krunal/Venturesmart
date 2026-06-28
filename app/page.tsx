@@ -1,6 +1,7 @@
 import { Check, ChevronRight, PackageCheck, ShieldCheck, Truck } from "lucide-react";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductListing } from "@/components/ProductListing";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { StorefrontSections } from "@/components/StorefrontSections";
 import { TransitionLink } from "@/components/TransitionLink";
 import { products } from "@/lib/products";
@@ -41,6 +42,8 @@ export default function Home() {
           </TransitionLink>
         </div>
       </section>
+
+      <RecentlyViewed catalog={products} />
 
       <section className="feature-band">
         <div className="feature-copy">

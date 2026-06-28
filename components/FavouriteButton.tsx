@@ -2,6 +2,7 @@
 
 import { Heart } from "lucide-react";
 import type { Product } from "@/lib/products";
+import { useAnnounce } from "./LiveRegion";
 import { useFavourites } from "./FavouritesProvider";
 
 type FavouriteButtonProps = {
@@ -12,6 +13,7 @@ type FavouriteButtonProps = {
 
 export function FavouriteButton({ product, className = "", size = 18 }: FavouriteButtonProps) {
   const { isFavourite, toggleFavourite } = useFavourites();
+  const announce = useAnnounce();
   const active = isFavourite(product.id);
 
   return (
@@ -23,6 +25,7 @@ export function FavouriteButton({ product, className = "", size = 18 }: Favourit
         event.preventDefault();
         event.stopPropagation();
         toggleFavourite(product);
+        announce(active ? `Removed ${product.name} from favourites` : `Added ${product.name} to favourites`);
       }}
       type="button"
     >

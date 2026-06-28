@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
 import { ProductListing } from "@/components/ProductListing";
+import { ProductRecentlyViewed } from "@/components/ProductRecentlyViewed";
 import { products } from "@/lib/products";
 
 export function generateStaticParams() {
@@ -32,6 +33,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <main>
       <ProductDetailClient product={product} />
+      <ProductRecentlyViewed
+        catalog={products}
+        excludeId={product.id}
+        heading="Recently viewed"
+        eyebrow="Continue browsing"
+      />
       <section className="section related-section">
         <ProductListing
           items={relatedProducts}

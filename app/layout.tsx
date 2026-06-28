@@ -1,12 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CartProvider } from "@/components/CartProvider";
+import { DemoBanner } from "@/components/DemoBanner";
 import { FavouritesProvider } from "@/components/FavouritesProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { LiveRegionProvider } from "@/components/LiveRegion";
 import { PageTransition, TransitionProvider } from "@/components/PageTransition";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter"
+});
 
 export const metadata: Metadata = {
   title: "Ventures Mart | Toys and Lunch Boxes",
@@ -32,18 +41,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <CartProvider>
-          <FavouritesProvider>
-            <TransitionProvider>
-              <Header />
-              <PageTransition>{children}</PageTransition>
-              <Footer />
-              <CartDrawer />
-              <ScrollAnimations />
-            </TransitionProvider>
-          </FavouritesProvider>
-        </CartProvider>
+      <body className={inter.className} suppressHydrationWarning>
+        <LiveRegionProvider>
+          <CartProvider>
+            <FavouritesProvider>
+              <TransitionProvider>
+                <a className="skip-link" href="#main-content">
+                  Skip to content
+                </a>
+                <Header />
+                <DemoBanner />
+                <PageTransition>{children}</PageTransition>
+                <Footer />
+                <CartDrawer />
+                <ScrollAnimations />
+              </TransitionProvider>
+            </FavouritesProvider>
+          </CartProvider>
+        </LiveRegionProvider>
       </body>
     </html>
   );

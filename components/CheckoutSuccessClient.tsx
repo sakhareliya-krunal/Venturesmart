@@ -21,7 +21,16 @@ export function CheckoutSuccessClient({ orderId }: CheckoutSuccessClientProps) {
   }, [orderId]);
 
   if (!ready) {
-    return null;
+    return (
+      <main>
+        <section className="inner-hero inner-hero-default product-detail-skeleton" aria-busy="true" aria-label="Loading order">
+          <div className="inner-hero-copy">
+            <div className="skeleton-line skeleton-line-sm" />
+            <div className="skeleton-line skeleton-line-lg" />
+          </div>
+        </section>
+      </main>
+    );
   }
 
   if (!order) {
@@ -50,10 +59,6 @@ export function CheckoutSuccessClient({ orderId }: CheckoutSuccessClientProps) {
         </div>
       </section>
 
-      <div className="demo-banner" role="status">
-        Demo checkout — no real payment collected.
-      </div>
-
       <section className="section page-section">
         <div className="order-success-card">
           <div className="order-success-header">
@@ -69,7 +74,7 @@ export function CheckoutSuccessClient({ orderId }: CheckoutSuccessClientProps) {
           </p>
 
           <div className="order-timeline" aria-label="Order status">
-            <div className="order-timeline-step active">
+            <div aria-current="step" className="order-timeline-step active">
               <Package size={18} />
               <span>Order placed</span>
             </div>

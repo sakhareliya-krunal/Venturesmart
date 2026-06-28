@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDownUp, Eye, GitCompare, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowDownUp, Eye, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   categories,
@@ -91,6 +91,14 @@ export function ProductListing({
 
   const filteredProductGroups = useMemo(() => groupProductVariants(productGroups), [productGroups]);
 
+  const resetFilters = () => {
+    setActiveCategory(initialCategory);
+    setQuery("");
+    setPriceBand("All");
+    setRatingBand("All");
+    setSortMode("featured");
+  };
+
   return (
     <>
       {showHeading && (
@@ -103,6 +111,7 @@ export function ProductListing({
             <label className="search-box">
               <Search size={18} />
               <input
+                aria-label="Search products"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search products or category"
@@ -117,6 +126,7 @@ export function ProductListing({
           <label className="search-box">
             <Search size={18} />
             <input
+              aria-label="Search products"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search products or category"
@@ -127,10 +137,11 @@ export function ProductListing({
 
       <div className="catalog-controls">
         {showCategories && (
-          <div className="category-tabs" role="tablist" aria-label="Product categories">
+          <div className="category-tabs" aria-label="Product categories">
             {categories.map((category) => (
               <button
                 key={category}
+                aria-pressed={activeCategory === category}
                 className={activeCategory === category ? "active" : ""}
                 onClick={() => setActiveCategory(category)}
                 type="button"
@@ -162,10 +173,13 @@ export function ProductListing({
       </div>
 
       {filteredProductGroups.length === 0 && (
-        <div className="empty-results">
+        <div className="empty-results" role="status">
           <Search size={28} />
           <h3>No products found</h3>
           <p>Try a broader category, price band, or search term.</p>
+          <button className="secondary-dark-link" onClick={resetFilters} type="button">
+            Reset filters
+          </button>
         </div>
       )}
     </>
@@ -206,9 +220,6 @@ function ProductCard({
         <div className="product-image-overlay" aria-hidden="true" />
         <div className="product-hover-actions">
           <FavouriteButton product={selectedProduct} />
-          <button className="compare-button" aria-label={`Compare ${selectedProduct.name}`} type="button">
-            <GitCompare size={18} />
-          </button>
           <TransitionLink href={`/products/${selectedProduct.slug}`} aria-label={`View ${selectedProduct.name}`}>
             <Eye size={18} />
           </TransitionLink>

@@ -91,7 +91,11 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   const context = useContext(TransitionContext);
   const phase = context?.phase ?? "idle";
 
-  return <div className={`route-shell ${phase}`}>{children}</div>;
+  return (
+    <div className={`route-shell ${phase}`} id="main-content">
+      {children}
+    </div>
+  );
 }
 
 export function useRouteTransition() {

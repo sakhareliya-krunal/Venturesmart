@@ -12,14 +12,15 @@ import {
   ShieldCheck,
   ShoppingCart,
   Star,
-  Truck,
-  ZoomIn
+  Truck
 } from "lucide-react";
-import { useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { FavouriteButton } from "@/components/FavouriteButton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSplitColumnScroll } from "@/hooks/useSplitColumnScroll";
+import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { formatPrice, getProductVariants, products, type Product } from "@/lib/products";
+import { useAnnounce } from "./LiveRegion";
 import { useRouteTransition } from "./PageTransition";
 import { useCart } from "./CartProvider";
 
@@ -31,11 +32,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.image);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [pincode, setPincode] = useState("");
+  const [pincodeResult, setPincodeResult] = useState("");
   const topRef = useRef<HTMLDivElement>(null);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const contentScrollRef = useRef<HTMLDivElement>(null);
   const { addToCart } = useCart();
   const { navigate } = useRouteTransition();
+  const announce = useAnnounce();
   const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
   const gallery = product.gallery.length > 0 ? product.gallery : [product.image];
   const colorVariants = getProductVariants(product, products);
@@ -47,6 +51,30 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     leftRef: galleryScrollRef,
     rightRef: contentScrollRef
   });
+
+  useEffect(() => {
+    recordRecentlyViewed(product);
+  }, [product]);
+
+  const checkPincode = () => {
+    if (!/^\d{6}$/.test(pincode.trim())) {
+      setPincodeResult("Enter a valid 6-digit pincode.");
+      return;
+    }
+
+    setPincodeResult("Delivery available in 2–5 business days.");
+  };
+
+  const increaseQuantity = () => {
+    setQuantity((current) => {
+      if (current >= 9) {
+        announce("Maximum quantity is 9");
+        return current;
+      }
+
+      return current + 1;
+    });
+  };
 
   const addQuantityToCart = () => {
     for (let index = 0; index < quantity; index += 1) {
@@ -95,10 +123,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 />
                 <span>{product.tag}</span>
                 <FavouriteButton className="product-favourite-corner" product={product} />
-                <button className="image-zoom-button" type="button" aria-label={`Zoom ${product.name}`}>
-                  <ZoomIn size={18} />
-                  Quick zoom
-                </button>
               </div>
               <div className="product-thumbnail-row" aria-label="Product highlights">
                 {gallery.map((image, index) => (
@@ -163,6 +187,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <div>
                   {colorVariants.map((variant) => (
                     <button
+                      aria-current={product.id === variant.id ? "true" : undefined}
                       aria-label={`Select ${variant.colorName} color`}
                       className={product.id === variant.id ? "active" : ""}
                       disabled={product.id === variant.id}
@@ -179,12 +204,41 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               </div>
             )}
 
-            <div className="delivery-estimator">
-              <Truck size={20} />
-              <div>
-                <strong>Delivery estimate</strong>
-                <span>Enter pincode at checkout. Most metro orders arrive in 2-5 days.</span>
+            <div className="pincode-delivery-card">
+              <div className="pincode-delivery-header">
+                <span className="pincode-delivery-icon" aria-hidden="true">
+                  <Truck size={18} />
+                </span>
+                <div>
+                  <strong>Check delivery</strong>
+                  <p>Enter your pincode for an estimated delivery timeline.</p>
+                </div>
               </div>
+              <div className="pincode-input-group">
+                <input
+                  aria-label="6-digit pincode"
+                  inputMode="numeric"
+                  maxLength={6}
+                  onChange={(event) => setPincode(event.target.value)}
+                  placeholder="6-digit pincode"
+                  value={pincode}
+                />
+                <button className="pincode-check-button" onClick={checkPincode} type="button">
+                  Check
+                </button>
+              </div>
+              {pincodeResult && (
+                <p
+                  className={
+                    pincodeResult.startsWith("Enter a valid")
+                      ? "pincode-delivery-result is-error"
+                      : "pincode-delivery-result"
+                  }
+                  role="status"
+                >
+                  {pincodeResult}
+                </p>
+              )}
             </div>
 
             <div className="quantity-row">
@@ -200,7 +254,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 <strong>{quantity}</strong>
                 <button
                   type="button"
-                  onClick={() => setQuantity((current) => Math.min(9, current + 1))}
+                  onClick={increaseQuantity}
                   aria-label="Increase quantity"
                 >
                   <Plus size={16} />
@@ -310,11 +364,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           <span>{formatPrice(product.price)}</span>
           <small>{product.stockStatus}</small>
         </div>
-        <button type="button" onClick={addQuantityToCart}>
+        <button
+          aria-label={`Add ${product.name} to cart`}
+          onClick={addQuantityToCart}
+          type="button"
+        >
           <ShoppingCart size={18} />
           Add
         </button>
-        <button type="button" onClick={buyNow}>
+        <button aria-label={`Buy ${product.name} now`} onClick={buyNow} type="button">
           Buy
         </button>
       </div>

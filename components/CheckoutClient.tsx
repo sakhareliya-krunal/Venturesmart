@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { BadgeIndianRupee, Banknote, CreditCard, Landmark, LockKeyhole, ShoppingBag, Truck } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useId, useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { useRouteTransition } from "@/components/PageTransition";
 import { formatPrice } from "@/lib/products";
@@ -38,6 +38,9 @@ export function CheckoutClient() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
   const [error, setError] = useState("");
   const [ready, setReady] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirectingEmpty, setRedirectingEmpty] = useState(false);
+  const errorId = useId();
 
   useEffect(() => {
     setReady(true);
@@ -45,12 +48,17 @@ export function CheckoutClient() {
 
   useEffect(() => {
     if (ready && cart.length === 0) {
-      navigate("/shop");
+      setRedirectingEmpty(true);
+      const timer = window.setTimeout(() => navigate("/shop"), 1200);
+      return () => window.clearTimeout(timer);
     }
   }, [cart.length, navigate, ready]);
 
   const updateField = (field: keyof CheckoutAddress, value: string) => {
     setAddress((current) => ({ ...current, [field]: value }));
+    if (error) {
+      setError("");
+    }
   };
 
   const validate = () => {
@@ -90,6 +98,8 @@ export function CheckoutClient() {
       return;
     }
 
+    setIsSubmitting(true);
+
     const orderId = generateOrderId();
     saveOrder({
       id: orderId,
@@ -114,8 +124,30 @@ export function CheckoutClient() {
     navigate(`/checkout/success?order=${encodeURIComponent(orderId)}`);
   };
 
-  if (!ready || cart.length === 0) {
-    return null;
+  if (!ready) {
+    return (
+      <main>
+        <section className="inner-hero inner-hero-default product-detail-skeleton" aria-busy="true" aria-label="Loading checkout">
+          <div className="inner-hero-copy">
+            <div className="skeleton-line skeleton-line-sm" />
+            <div className="skeleton-line skeleton-line-lg" />
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (cart.length === 0) {
+    return (
+      <main>
+        <section className="section page-section">
+          <div className="checkout-empty-notice" role="status">
+            <h1>Your cart is empty</h1>
+            <p>{redirectingEmpty ? "Redirecting you to the shop…" : "Add products before checkout."}</p>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -128,17 +160,13 @@ export function CheckoutClient() {
         </div>
       </section>
 
-      <div className="demo-banner" role="status">
-        Demo checkout — no real payment collected.
-      </div>
-
       <section className="section page-section">
         <form className="checkout-layout" onSubmit={handleSubmit}>
           <div className="checkout-panel">
             <div className="checkout-trust-strip">
               <span>
                 <LockKeyhole size={17} />
-                Demo only
+                Secure preview
               </span>
               <span>
                 <Truck size={17} />
@@ -159,6 +187,8 @@ export function CheckoutClient() {
                   onChange={(event) => updateField("fullName", event.target.value)}
                   placeholder="Enter your name"
                   autoComplete="name"
+                  aria-invalid={Boolean(error && !address.fullName.trim())}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field">
@@ -169,6 +199,8 @@ export function CheckoutClient() {
                   placeholder="10-digit mobile number"
                   autoComplete="tel"
                   inputMode="tel"
+                  aria-invalid={Boolean(error && address.phone.replace(/\D/g, "").length < 10)}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field">
@@ -179,6 +211,8 @@ export function CheckoutClient() {
                   placeholder="you@example.com"
                   autoComplete="email"
                   type="email"
+                  aria-invalid={Boolean(error && (!address.email.trim() || !address.email.includes("@")))}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field checkout-field-wide">
@@ -188,6 +222,8 @@ export function CheckoutClient() {
                   onChange={(event) => updateField("addressLine", event.target.value)}
                   placeholder="House no., street, landmark"
                   autoComplete="street-address"
+                  aria-invalid={Boolean(error && !address.addressLine.trim())}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field">
@@ -197,6 +233,8 @@ export function CheckoutClient() {
                   onChange={(event) => updateField("city", event.target.value)}
                   placeholder="City"
                   autoComplete="address-level2"
+                  aria-invalid={Boolean(error && !address.city.trim())}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field">
@@ -206,6 +244,8 @@ export function CheckoutClient() {
                   onChange={(event) => updateField("state", event.target.value)}
                   placeholder="State"
                   autoComplete="address-level1"
+                  aria-invalid={Boolean(error && !address.state.trim())}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
               <label className="checkout-field">
@@ -217,6 +257,8 @@ export function CheckoutClient() {
                   autoComplete="postal-code"
                   inputMode="numeric"
                   maxLength={6}
+                  aria-invalid={Boolean(error && !/^\d{6}$/.test(address.pincode.trim()))}
+                  aria-describedby={error ? errorId : undefined}
                 />
               </label>
             </div>
@@ -246,10 +288,14 @@ export function CheckoutClient() {
               })}
             </div>
 
-            {error && <p className="checkout-error">{error}</p>}
+            {error && (
+              <p className="checkout-error" id={errorId} role="alert">
+                {error}
+              </p>
+            )}
 
-            <button className="checkout-button checkout-submit" type="submit">
-              Place order (demo)
+            <button className="checkout-button checkout-submit" disabled={isSubmitting} type="submit">
+              {isSubmitting ? "Placing order…" : "Place order (demo)"}
             </button>
           </div>
 

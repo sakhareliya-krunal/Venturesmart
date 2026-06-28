@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { heroSlides } from "@/lib/hero-slides";
 import { TransitionLink } from "./TransitionLink";
 
@@ -12,6 +12,7 @@ export function HeroCarousel() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const carouselRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -74,14 +75,29 @@ export function HeroCarousel() {
     event.stopPropagation();
   };
 
+  const handleCarouselKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrev();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
+  };
+
   return (
     <section
+      ref={carouselRef}
       className="hero-carousel"
       id="top"
       aria-roledescription="carousel"
       aria-label="Featured promotions"
+      onKeyDown={handleCarouselKeyDown}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      tabIndex={0}
     >
       <div className="hero-carousel-track">
         {heroSlides.map((slide, index) => (
@@ -89,6 +105,7 @@ export function HeroCarousel() {
             key={slide.title}
             className={index === activeIndex ? "hero-slide active" : "hero-slide"}
             aria-hidden={index !== activeIndex}
+            {...(index !== activeIndex ? { inert: true } : {})}
           >
             <div
               className="hero-slide-media"
@@ -113,7 +130,7 @@ export function HeroCarousel() {
               <h1>{slide.title}</h1>
               <p>{slide.description}</p>
               <div className="hero-slide-actions">
-                <TransitionLink className="primary-link" href={slide.href}>
+                <TransitionLink className="primary-link" href={slide.href} tabIndex={index === activeIndex ? 0 : -1}>
                   {slide.ctaLabel} <ChevronRight size={18} />
                 </TransitionLink>
               </div>
@@ -122,39 +139,35 @@ export function HeroCarousel() {
         ))}
       </div>
 
-      {!reducedMotion && (
-        <>
+      <button
+        type="button"
+        className="hero-carousel-arrow hero-carousel-prev"
+        onClick={goPrev}
+        aria-label="Previous slide"
+      >
+        <ChevronLeft size={24} />
+      </button>
+      <button
+        type="button"
+        className="hero-carousel-arrow hero-carousel-next"
+        onClick={goNext}
+        aria-label="Next slide"
+      >
+        <ChevronRight size={24} />
+      </button>
+      <div className="hero-carousel-dots" role="tablist" aria-label="Slide navigation">
+        {heroSlides.map((slide, index) => (
           <button
+            key={slide.title}
             type="button"
-            className="hero-carousel-arrow hero-carousel-prev"
-            onClick={goPrev}
-            aria-label="Previous slide"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            type="button"
-            className="hero-carousel-arrow hero-carousel-next"
-            onClick={goNext}
-            aria-label="Next slide"
-          >
-            <ChevronRight size={24} />
-          </button>
-          <div className="hero-carousel-dots" role="tablist" aria-label="Slide navigation">
-            {heroSlides.map((slide, index) => (
-              <button
-                key={slide.title}
-                type="button"
-                role="tab"
-                aria-selected={index === activeIndex}
-                aria-label={`Go to slide ${index + 1}`}
-                className={index === activeIndex ? "active" : ""}
-                onClick={() => goTo(index)}
-              />
-            ))}
-          </div>
-        </>
-      )}
+            role="tab"
+            aria-selected={index === activeIndex}
+            aria-label={`Go to slide ${index + 1}`}
+            className={index === activeIndex ? "active" : ""}
+            onClick={() => goTo(index)}
+          />
+        ))}
+      </div>
     </section>
   );
 }

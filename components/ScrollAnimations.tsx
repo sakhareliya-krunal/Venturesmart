@@ -34,9 +34,12 @@ export function ScrollAnimations() {
   const pathname = usePathname();
 
   useEffect(() => {
+    const mainContent = document.getElementById("main-content");
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const catalogPage = isCatalogPath(pathname);
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(revealSelector));
+    const elements = mainContent
+      ? Array.from(mainContent.querySelectorAll<HTMLElement>(revealSelector))
+      : Array.from(document.querySelectorAll<HTMLElement>(revealSelector));
 
     elements.forEach((element, index) => {
       element.classList.add("reveal");

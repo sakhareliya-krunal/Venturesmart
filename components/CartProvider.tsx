@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { CartItem, Product } from "@/lib/products";
+import { useAnnounce } from "./LiveRegion";
 
 type AddToCartOptions = {
   openDrawer?: boolean;
@@ -26,6 +27,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const announce = useAnnounce();
 
   useEffect(() => {
     const saved = window.localStorage.getItem("toyjoy-cart");
@@ -49,8 +51,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...current, { ...product, quantity: 1 }];
     });
 
-    if (options?.openDrawer !== false) {
+    const shouldOpenDrawer = options?.openDrawer !== false;
+    if (shouldOpenDrawer) {
       setCartOpen(true);
+    } else {
+      announce(`Added ${product.name} to cart`);
     }
   };
 

@@ -1,7 +1,9 @@
 import { Mail, MapPin, Phone } from "lucide-react";
+import { ContactForm } from "@/components/ContactForm";
 import { InnerHero } from "@/components/InnerHero";
 import { PageContent } from "@/components/PageContent";
 import { defaultTrustStats } from "@/lib/page-trust-stats";
+import { supportPhoneDisplay, supportPhoneTel } from "@/lib/site-contact";
 
 export const metadata = {
   title: "Contact | Ventures Mart"
@@ -20,26 +22,31 @@ export default function ContactPage() {
         <div className="content-grid">
           <article className="info-card">
             <div className="info-card-icon">
-              <Mail size={26} />
+              <Mail size={26} aria-hidden="true" />
             </div>
             <h2>Email</h2>
-            <p>support@venturesmart.in</p>
+            <p>
+              <a href="mailto:support@venturesmart.in">support@venturesmart.in</a>
+            </p>
           </article>
           <article className="info-card">
             <div className="info-card-icon">
-              <Phone size={26} />
+              <Phone size={26} aria-hidden="true" />
             </div>
             <h2>Phone</h2>
-            <p>+91 98765 43210</p>
+            <p>
+              <a href={supportPhoneTel}>{supportPhoneDisplay}</a>
+            </p>
           </article>
           <article className="info-card">
             <div className="info-card-icon">
-              <MapPin size={26} />
+              <MapPin size={26} aria-hidden="true" />
             </div>
             <h2>Service area</h2>
             <p>Delivery support across India.</p>
           </article>
         </div>
+        <ContactForm />
       </PageContent>
     </main>
   );

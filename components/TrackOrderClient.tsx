@@ -16,6 +16,7 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
   const [order, setOrder] = useState<StoredOrder | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialOrderId) {
@@ -27,6 +28,21 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
     event.preventDefault();
     setSearched(true);
 
+    if (!orderId.trim()) {
+      setError("Enter your order ID.");
+      setNotFound(false);
+      setOrder(null);
+      return;
+    }
+
+    if (!contact.trim()) {
+      setError("Enter the phone or email used during checkout.");
+      setNotFound(false);
+      setOrder(null);
+      return;
+    }
+
+    setError("");
     const match = findOrder(orderId, contact);
     setOrder(match);
     setNotFound(!match);
@@ -38,19 +54,38 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
         <label>
           Order ID
           <input
+            name="orderId"
             value={orderId}
-            onChange={(event) => setOrderId(event.target.value)}
+            onChange={(event) => {
+              setOrderId(event.target.value);
+              if (error) {
+                setError("");
+              }
+            }}
             placeholder="VM-10024"
+            autoComplete="off"
           />
         </label>
         <label>
           Phone or email
           <input
+            name="contact"
             value={contact}
-            onChange={(event) => setContact(event.target.value)}
+            onChange={(event) => {
+              setContact(event.target.value);
+              if (error) {
+                setError("");
+              }
+            }}
             placeholder="Enter contact used for order"
+            autoComplete="email"
           />
         </label>
+        {error && (
+          <p className="checkout-error" role="alert">
+            {error}
+          </p>
+        )}
         <button className="primary-link" type="submit">
           <Search size={18} />
           Track order
@@ -58,8 +93,8 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
         <p>Demo orders are stored in this browser only.</p>
       </form>
 
-      {searched && notFound && (
-        <div className="order-success-card track-order-result">
+      {searched && notFound && !error && (
+        <div className="order-success-card track-order-result" role="alert">
           <h2>Order not found</h2>
           <p>Check the order ID and the phone or email used during checkout.</p>
         </div>
@@ -74,11 +109,11 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
           </p>
 
           <div className="order-timeline" aria-label="Order status">
-            <div className="order-timeline-step active">
+            <div aria-current="step" className="order-timeline-step active">
               <Package size={18} />
               <span>Order placed</span>
             </div>
-            <div className="order-timeline-step active">
+            <div className="order-timeline-step">
               <Package size={18} />
               <span>Packed</span>
             </div>
