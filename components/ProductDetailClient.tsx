@@ -314,14 +314,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             <section className="product-detail-section">
               <p className="eyebrow dark">Details</p>
               <h2>Specifications</h2>
-              <div className="spec-table">
+              <dl className="spec-grid">
                 {product.specs.map((spec) => (
-                  <div key={spec.label}>
-                    <span>{spec.label}</span>
-                    <strong>{spec.value}</strong>
+                  <div className="spec-grid-row" key={spec.label}>
+                    <dt>{spec.label}</dt>
+                    <dd>{spec.value}</dd>
                   </div>
                 ))}
-              </div>
+              </dl>
             </section>
 
             <section className="product-detail-section">
@@ -336,8 +336,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                   </span>
                 </div>
                 <p>
-                  Customers highlight useful details, reliable packaging, and clear checkout expectations in this
-                  static storefront preview.
+                  Customers highlight useful details, reliable packaging, and a smooth buying experience.
                 </p>
               </div>
 
@@ -360,7 +359,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       </div>
 
       <div className="mobile-buy-bar" aria-label="Mobile purchase actions">
-        <div>
+        <div className="mobile-buy-bar-copy">
+          <strong className="mobile-buy-bar-title">{product.name}</strong>
           <span>{formatPrice(product.price)}</span>
           <small>{product.stockStatus}</small>
         </div>
@@ -370,10 +370,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           type="button"
         >
           <ShoppingCart size={18} />
-          Add
+          <span>Add to cart</span>
         </button>
         <button aria-label={`Buy ${product.name} now`} onClick={buyNow} type="button">
-          Buy
+          <span>Buy now</span>
         </button>
       </div>
     </section>

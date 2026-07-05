@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CartProvider } from "@/components/CartProvider";
-import { DemoBanner } from "@/components/DemoBanner";
 import { FavouritesProvider } from "@/components/FavouritesProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -50,7 +49,6 @@ export default function RootLayout({
                   Skip to content
                 </a>
                 <Header />
-                <DemoBanner />
                 <PageTransition>{children}</PageTransition>
                 <Footer />
                 <CartDrawer />

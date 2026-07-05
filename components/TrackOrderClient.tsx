@@ -90,7 +90,7 @@ export function TrackOrderClient({ initialOrderId = "" }: TrackOrderClientProps)
           <Search size={18} />
           Track order
         </button>
-        <p>Demo orders are stored in this browser only.</p>
+        <p>Orders from this device are saved for tracking.</p>
       </form>
 
       {searched && notFound && !error && (

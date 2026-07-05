@@ -156,7 +156,7 @@ export function CheckoutClient() {
         <div className="inner-hero-copy">
           <p className="eyebrow">Checkout</p>
           <h1>Complete your order</h1>
-          <p>Review delivery details, choose a payment method, and place your demo order.</p>
+          <p>Review delivery details, choose a payment method, and place your order.</p>
         </div>
       </section>
 
@@ -166,7 +166,7 @@ export function CheckoutClient() {
             <div className="checkout-trust-strip">
               <span>
                 <LockKeyhole size={17} />
-                Secure preview
+                Secure checkout
               </span>
               <span>
                 <Truck size={17} />
@@ -174,7 +174,7 @@ export function CheckoutClient() {
               </span>
               <span>
                 <ShoppingBag size={17} />
-                Local order preview
+                Track your order anytime
               </span>
             </div>
 
@@ -295,7 +295,7 @@ export function CheckoutClient() {
             )}
 
             <button className="checkout-button checkout-submit" disabled={isSubmitting} type="submit">
-              {isSubmitting ? "Placing order…" : "Place order (demo)"}
+              {isSubmitting ? "Placing order…" : "Place order"}
             </button>
           </div>
 
@@ -342,7 +342,7 @@ export function CheckoutClient() {
 
             <div className="checkout-summary-note">
               <ShoppingBag size={18} />
-              <p>Your selected payment method will be simulated in this demo flow only.</p>
+              <p>Your order is saved so you can track delivery.</p>
             </div>
           </aside>
         </form>

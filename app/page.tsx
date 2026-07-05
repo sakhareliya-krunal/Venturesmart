@@ -22,7 +22,7 @@ export default function Home() {
         </div>
         <div>
           <PackageCheck size={22} />
-          <span>Secure checkout preview</span>
+          <span>Secure checkout</span>
         </div>
       </section>
 

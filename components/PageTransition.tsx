@@ -8,80 +8,76 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
+  useTransition
 } from "react";
+import { RouteLoader } from "./RouteLoader";
 
-type TransitionPhase = "idle" | "leaving" | "entering";
+const loaderShowDelay = 100;
 
 type TransitionContextValue = {
-  phase: TransitionPhase;
+  isPending: boolean;
   navigate: (href: string) => void;
 };
 
 const TransitionContext = createContext<TransitionContextValue | null>(null);
-const exitDuration = 160;
-const enterDuration = 320;
 
 export function TransitionProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [phase, setPhase] = useState<TransitionPhase>("idle");
-  const firstRender = useRef(true);
+  const [isPending, startTransition] = useTransition();
+  const [showLoader, setShowLoader] = useState(false);
   const pendingScrollTop = useRef(false);
-  const timeoutRef = useRef<number | null>(null);
+  const showTimerRef = useRef<number | null>(null);
 
-  const clearTimer = () => {
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+  const clearShowTimer = () => {
+    if (showTimerRef.current) {
+      window.clearTimeout(showTimerRef.current);
+      showTimerRef.current = null;
     }
   };
 
   const navigate = useCallback(
     (href: string) => {
-      if (href === pathname || phase === "leaving") {
+      if (href === pathname) {
         return;
       }
 
-      clearTimer();
       pendingScrollTop.current = true;
-      setPhase("leaving");
-      timeoutRef.current = window.setTimeout(() => {
+      startTransition(() => {
         router.push(href, { scroll: false });
-      }, exitDuration);
+      });
     },
-    [pathname, phase, router]
+    [pathname, router]
   );
 
   useEffect(() => {
-    clearTimer();
-
-    if (firstRender.current) {
-      firstRender.current = false;
-      setPhase("idle");
-      return;
+    if (isPending) {
+      showTimerRef.current = window.setTimeout(() => {
+        setShowLoader(true);
+      }, loaderShowDelay);
+    } else {
+      clearShowTimer();
+      setShowLoader(false);
     }
 
+    return clearShowTimer;
+  }, [isPending]);
+
+  useEffect(() => {
     if (pendingScrollTop.current) {
       pendingScrollTop.current = false;
       window.requestAnimationFrame(() => {
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       });
     }
-
-    setPhase("entering");
-    timeoutRef.current = window.setTimeout(() => {
-      setPhase("idle");
-    }, enterDuration);
-
-    return clearTimer;
   }, [pathname]);
 
-  const value = useMemo(() => ({ phase, navigate }), [navigate, phase]);
+  const value = useMemo(() => ({ isPending, navigate }), [isPending, navigate]);
 
   return (
     <TransitionContext.Provider value={value}>
-      <div className={phase === "leaving" ? "route-progress active" : "route-progress"} />
+      <RouteLoader visible={showLoader} />
       {children}
     </TransitionContext.Provider>
   );
@@ -89,10 +85,22 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const context = useContext(TransitionContext);
-  const phase = context?.phase ?? "idle";
+  const pathname = usePathname();
+  const isPending = context?.isPending ?? false;
+  const [revealReady, setRevealReady] = useState(false);
+
+  useEffect(() => {
+    setRevealReady(false);
+    const frameId = requestAnimationFrame(() => setRevealReady(true));
+    return () => cancelAnimationFrame(frameId);
+  }, [pathname]);
 
   return (
-    <div className={`route-shell ${phase}`} id="main-content">
+    <div
+      aria-busy={isPending}
+      className={`route-shell${revealReady ? " reveal-ready" : ""}`}
+      id="main-content"
+    >
       {children}
     </div>
   );

@@ -1,9 +1,13 @@
 import { InnerHero } from "@/components/InnerHero";
 import { PageContent } from "@/components/PageContent";
+import { PolicyDocument } from "@/components/PolicyDocument";
+import { legalLastUpdated, privacySections } from "@/lib/legal-content";
 import { policyTrustStats } from "@/lib/page-trust-stats";
 
 export const metadata = {
-  title: "Privacy Policy | Ventures Mart"
+  title: "Privacy Policy | Ventures Mart",
+  description:
+    "Learn how Ventures Mart collects, uses, and protects your personal information when you shop for toys and lunch boxes in India."
 };
 
 export default function PrivacyPage() {
@@ -12,24 +16,11 @@ export default function PrivacyPage() {
       <InnerHero
         eyebrow="Policy"
         title="Privacy Policy"
-        description="How Ventures Mart should handle customer data when the store becomes fully transactional."
+        description="How Ventures Mart handles your personal information when you browse, order, and contact support."
         stats={policyTrustStats}
       />
       <PageContent>
-        <div className="policy-content">
-          <div className="policy-block">
-            <h2>Customer information</h2>
-            <p>Ventures Mart may collect name, contact details, delivery address, and order information to process purchases.</p>
-          </div>
-          <div className="policy-block">
-            <h2>Payment data</h2>
-            <p>When payments are enabled, card or UPI processing should be handled by the selected payment gateway.</p>
-          </div>
-          <div className="policy-block">
-            <h2>Communication</h2>
-            <p>Customer contact details may be used for order updates, support, and service-related messages.</p>
-          </div>
-        </div>
+        <PolicyDocument lastUpdated={legalLastUpdated} sections={privacySections} />
       </PageContent>
     </main>
   );

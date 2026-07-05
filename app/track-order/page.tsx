@@ -19,7 +19,7 @@ export default async function TrackOrderPage({ searchParams }: TrackOrderPagePro
       <InnerHero
         eyebrow="Support"
         title="Track order"
-        description="Look up demo orders placed in this browser using your order ID and contact details."
+        description="Look up orders using your order ID and contact details."
         stats={trackOrderTrustStats}
       />
       <PageContent>

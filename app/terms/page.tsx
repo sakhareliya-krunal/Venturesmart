@@ -1,9 +1,13 @@
 import { InnerHero } from "@/components/InnerHero";
 import { PageContent } from "@/components/PageContent";
+import { PolicyDocument } from "@/components/PolicyDocument";
+import { legalLastUpdated, termsSections } from "@/lib/legal-content";
 import { policyTrustStats } from "@/lib/page-trust-stats";
 
 export const metadata = {
-  title: "Terms | Ventures Mart"
+  title: "Terms and Conditions | Ventures Mart",
+  description:
+    "Read the terms and conditions for using Ventures Mart, including orders, shipping, returns, and customer responsibilities in India."
 };
 
 export default function TermsPage() {
@@ -12,24 +16,11 @@ export default function TermsPage() {
       <InnerHero
         eyebrow="Policy"
         title="Terms and Conditions"
-        description="Starter terms for browsing, ordering, and using the Ventures Mart storefront."
+        description="The terms that apply when you browse, order from, and use the Ventures Mart storefront."
         stats={policyTrustStats}
       />
       <PageContent>
-        <div className="policy-content">
-          <div className="policy-block">
-            <h2>Use of website</h2>
-            <p>Customers should use the website for lawful browsing, product discovery, and order placement.</p>
-          </div>
-          <div className="policy-block">
-            <h2>Product information</h2>
-            <p>Product prices, availability, and descriptions may change as inventory and business details evolve.</p>
-          </div>
-          <div className="policy-block">
-            <h2>Orders</h2>
-            <p>Final order confirmation, payment collection, and fulfillment rules will apply when checkout is activated.</p>
-          </div>
-        </div>
+        <PolicyDocument lastUpdated={legalLastUpdated} sections={termsSections} />
       </PageContent>
     </main>
   );

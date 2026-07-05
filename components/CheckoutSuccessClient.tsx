@@ -55,7 +55,7 @@ export function CheckoutSuccessClient({ orderId }: CheckoutSuccessClientProps) {
         <div className="inner-hero-copy">
           <p className="eyebrow">Order confirmed</p>
           <h1>Thank you for your order</h1>
-          <p>Your demo order has been placed successfully. Save your order ID to track delivery.</p>
+          <p>Your order has been placed successfully. Save your order ID to track delivery.</p>
         </div>
       </section>
 

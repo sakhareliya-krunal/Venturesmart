@@ -19,23 +19,25 @@ export function InnerHero({
 }) {
   return (
     <section className={`inner-hero inner-hero-${variant}`}>
-      <div className="inner-hero-copy">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1>{title}</h1>
-        <p>{description}</p>
-        {stats.length > 0 && (
-          <div className="inner-hero-stats">
-            {stats.map((stat) => (
-              <div key={stat.label}>
-                <strong>{stat.value}</strong>
-                <span>{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        {actions && <div className="inner-hero-actions">{actions}</div>}
+      <div className="inner-hero-shell">
+        <div className="inner-hero-copy">
+          <p className="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p>{description}</p>
+          {stats.length > 0 && (
+            <dl className="inner-hero-meta">
+              {stats.map((stat) => (
+                <div key={stat.label}>
+                  <dt>{stat.label}</dt>
+                  <dd>{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {actions && <div className="inner-hero-actions">{actions}</div>}
+        </div>
+        {children && <div className="inner-hero-panel">{children}</div>}
       </div>
-      {children && <div className="inner-hero-panel">{children}</div>}
     </section>
   );
 }

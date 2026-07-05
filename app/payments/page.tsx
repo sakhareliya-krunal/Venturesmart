@@ -1,5 +1,5 @@
-import { BadgeIndianRupee, CreditCard, ShieldCheck } from "lucide-react";
 import { InnerHero } from "@/components/InnerHero";
+import { ComingSoonCard } from "@/components/ComingSoonCard";
 import { PageContent } from "@/components/PageContent";
 import { defaultTrustStats } from "@/lib/page-trust-stats";
 
@@ -11,47 +11,16 @@ export default function PaymentsPage() {
   return (
     <main>
       <InnerHero
-        eyebrow="Future integration"
-        title="Best payment fit for India"
-        description="Demo checkout is available for UI testing. Live Razorpay collection can be connected later."
+        eyebrow="Payments"
+        title="Payment options"
+        description="Secure Indian payment methods will be available here soon."
         stats={defaultTrustStats}
       />
       <PageContent>
-        <div className="payment-grid">
-          <article className="payment-card recommended">
-            <div className="payment-card-icon">
-              <BadgeIndianRupee size={28} />
-            </div>
-            <h3>Razorpay</h3>
-            <p>
-              Recommended first because it supports common Indian payment modes, has strong web
-              checkout docs, and works well with Node.js/Next.js backends.
-            </p>
-            <span>Use later: Standard Checkout + server-side order verification</span>
-          </article>
-          <article className="payment-card">
-            <div className="payment-card-icon">
-              <CreditCard size={28} />
-            </div>
-            <h3>Cashfree or PayU</h3>
-            <p>
-              Good alternatives if pricing, settlement, onboarding, or support terms are better for
-              the business account.
-            </p>
-            <span>Compare before launch: MDR, settlement time, refunds, support</span>
-          </article>
-          <article className="payment-card">
-            <div className="payment-card-icon">
-              <ShieldCheck size={28} />
-            </div>
-            <h3>Recommended methods</h3>
-            <p>
-              Keep UPI, cards, net banking, wallets, and cash on delivery visible for India-only
-              customers.
-            </p>
-            <span>Demo checkout available now; live gateway later</span>
-          </article>
-        </div>
+        <ComingSoonCard
+          title="Payments coming soon"
+          description="UPI, cards, net banking, and COD will be enabled when live checkout goes live."
+        />
       </PageContent>
     </main>
   );

@@ -73,6 +73,7 @@ export function ContactForm() {
   return (
     <form className="track-form contact-form" onSubmit={handleSubmit}>
       <h2>Send us a message</h2>
+      <p className="contact-form-lead">We typically reply within 1–2 business days.</p>
       <label>
         Full name
         <input

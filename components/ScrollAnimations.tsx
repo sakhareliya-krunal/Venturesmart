@@ -11,23 +11,34 @@ const revealSelector = [
   ".section-action",
   ".page-content-panel",
   ".page-content-panel > *",
-  ".product-card",
   ".feature-band > *",
   ".feature-list > div",
   ".payment-card",
   ".info-card",
   ".statement-band",
+  ".contact-channels",
+  ".contact-form-section",
+  ".policy-document-header",
   ".policy-content",
+  ".policy-document-cta",
   ".track-form",
+  ".footer-trust > div",
   ".footer-main > *",
   ".footer-payments",
   ".footer-bottom"
 ].join(",");
 
+const catalogInstantSelector =
+  ".catalog-controls, .shop-toolbar, .empty-results";
+
 const catalogPaths = ["/shop", "/favourites"];
 
 function isCatalogPath(pathname: string) {
   return catalogPaths.includes(pathname) || pathname.startsWith("/categories/");
+}
+
+function markInView(element: HTMLElement) {
+  element.setAttribute("data-inview", "true");
 }
 
 export function ScrollAnimations() {
@@ -41,25 +52,18 @@ export function ScrollAnimations() {
       ? Array.from(mainContent.querySelectorAll<HTMLElement>(revealSelector))
       : Array.from(document.querySelectorAll<HTMLElement>(revealSelector));
 
-    elements.forEach((element, index) => {
-      element.classList.add("reveal");
-      element.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 55}ms`);
-    });
+    elements.forEach((element) => element.removeAttribute("data-inview"));
 
     if (catalogPage) {
       const catalogRoot = document.getElementById("catalog-products") ?? document.getElementById("page-content");
 
       if (catalogRoot) {
-        catalogRoot.querySelectorAll<HTMLElement>(
-          ".section-heading, .section-heading-compact, .catalog-controls, .shop-toolbar, .product-card, .empty-results"
-        ).forEach((element) => {
-          element.classList.add("visible");
-        });
+        catalogRoot.querySelectorAll<HTMLElement>(catalogInstantSelector).forEach(markInView);
       }
     }
 
     if (prefersReducedMotion) {
-      elements.forEach((element) => element.classList.add("visible"));
+      elements.forEach(markInView);
       return;
     }
 
@@ -67,7 +71,7 @@ export function ScrollAnimations() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            markInView(entry.target as HTMLElement);
             observer.unobserve(entry.target);
           }
         });

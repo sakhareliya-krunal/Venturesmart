@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ArrowDownUp, Eye, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   categories,
@@ -13,6 +14,7 @@ import {
 } from "@/lib/products";
 import { CustomDropdown } from "./CustomDropdown";
 import { FavouriteButton } from "./FavouriteButton";
+import { ScrollReveal } from "./ScrollReveal";
 import { useCart } from "./CartProvider";
 import { TransitionLink } from "./TransitionLink";
 
@@ -26,6 +28,12 @@ type ProductListingProps = {
   initialCategory?: "All" | ProductCategory;
 };
 
+const catalogPaths = ["/shop", "/favourites"];
+
+function isCatalogPath(pathname: string) {
+  return catalogPaths.includes(pathname) || pathname.startsWith("/categories/");
+}
+
 export function ProductListing({
   items,
   heading = "Shop by category",
@@ -35,6 +43,8 @@ export function ProductListing({
   showHeading = true,
   initialCategory = "All"
 }: ProductListingProps) {
+  const pathname = usePathname();
+  const isCatalogPage = isCatalogPath(pathname);
   const [activeCategory, setActiveCategory] = useState<typeof initialCategory>(initialCategory);
   const [query, setQuery] = useState("");
   const [priceBand, setPriceBand] = useState("All");
@@ -102,7 +112,7 @@ export function ProductListing({
   return (
     <>
       {showHeading && (
-        <div className="section-heading">
+        <ScrollReveal className="section-heading" delayIndex={0} instant={isCatalogPage}>
           <div>
             <p className="eyebrow dark">{eyebrow}</p>
             <h2>{heading}</h2>
@@ -118,11 +128,11 @@ export function ProductListing({
               />
             </label>
           )}
-        </div>
+        </ScrollReveal>
       )}
 
       {!showHeading && searchable && (
-        <div className="section-heading section-heading-compact">
+        <ScrollReveal className="section-heading section-heading-compact" delayIndex={0} instant={isCatalogPage}>
           <label className="search-box">
             <Search size={18} />
             <input
@@ -132,7 +142,7 @@ export function ProductListing({
               placeholder="Search products or category"
             />
           </label>
-        </div>
+        </ScrollReveal>
       )}
 
       <div className="catalog-controls">
@@ -167,8 +177,14 @@ export function ProductListing({
       </div>
 
       <div className="product-grid">
-        {filteredProductGroups.map((group) => (
-          <ProductCard group={group} key={group.key} onAddToCart={addToCart} />
+        {filteredProductGroups.map((group, index) => (
+          <ProductCard
+            delayIndex={index % 6}
+            group={group}
+            instant={isCatalogPage}
+            key={group.key}
+            onAddToCart={addToCart}
+          />
         ))}
       </div>
 
@@ -187,10 +203,14 @@ export function ProductListing({
 }
 
 function ProductCard({
+  delayIndex,
   group,
+  instant,
   onAddToCart
 }: {
+  delayIndex: number;
   group: ProductVariantGroup;
+  instant: boolean;
   onAddToCart: (product: Product) => void;
 }) {
   const [selectedProduct, setSelectedProduct] = useState(group.product);
@@ -202,7 +222,7 @@ function ProductCard({
   }, [group.product]);
 
   return (
-    <article className="product-card">
+    <ScrollReveal as="article" className="product-card" delayIndex={delayIndex} instant={instant}>
       <div className="product-image">
         <TransitionLink href={`/products/${selectedProduct.slug}`} aria-label={`View ${selectedProduct.name}`}>
           <Image
@@ -282,6 +302,6 @@ function ProductCard({
           </button>
         </div>
       </div>
-    </article>
+    </ScrollReveal>
   );
 }

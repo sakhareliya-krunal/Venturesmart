@@ -63,11 +63,20 @@ export function StorefrontSections() {
         <div className="category-card-grid">
           {categoryPages.map((category) => (
             <TransitionLink className="category-card" href={`/categories/${category.slug}`} key={category.slug}>
-              <Image src={categoryImages[category.title]} alt="" fill sizes="(max-width: 720px) 50vw, 20vw" />
-              <span>{category.title}</span>
-              <strong>
-                {getDisplayProducts(products.filter((product) => product.category === category.category)).length} products
-              </strong>
+              <Image
+                src={categoryImages[category.title]}
+                alt={category.title}
+                fill
+                sizes="(max-width: 540px) 100vw, 480px"
+              />
+              <div className="category-card-copy">
+                <span>{category.title}</span>
+                <strong>
+                  {getDisplayProducts(products.filter((product) => product.category === category.category)).length}{" "}
+                  products
+                </strong>
+              </div>
+              <ChevronRight className="category-card-arrow" aria-hidden="true" size={18} />
             </TransitionLink>
           ))}
         </div>

@@ -31,7 +31,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .slice(0, 4);
 
   return (
-    <main>
+    <main className="product-page">
       <ProductDetailClient product={product} />
       <ProductRecentlyViewed
         catalog={products}
