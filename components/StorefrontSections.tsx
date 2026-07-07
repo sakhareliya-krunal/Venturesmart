@@ -13,6 +13,7 @@ import {
   Truck
 } from "lucide-react";
 import { categoryPages, formatPrice, getDisplayProducts, products } from "@/lib/products";
+import { MiniProductCard } from "./MiniProductCard";
 import { TransitionLink } from "./TransitionLink";
 
 const categoryImages: Record<string, string> = {
@@ -116,16 +117,7 @@ export function StorefrontSections() {
         </div>
         <div className="mini-product-grid">
           {bestSellers.map((product) => (
-            <TransitionLink className="mini-product-card" href={`/products/${product.slug}`} key={product.id}>
-              <div className="mini-product-image">
-                <Image src={product.image} alt={product.name} fill sizes="108px" />
-              </div>
-              <div>
-                <span>{product.category}</span>
-                <strong>{product.name}</strong>
-                <small>{formatPrice(product.price)}</small>
-              </div>
-            </TransitionLink>
+            <MiniProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>

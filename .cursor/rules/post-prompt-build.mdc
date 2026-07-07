@@ -1,0 +1,19 @@
+---
+description: Run production build after every agent turn
+alwaysApply: true
+---
+
+# Post-prompt build verification
+
+After completing every user prompt in this project (including question-only prompts), run:
+
+```bash
+npm run build
+```
+
+from the project root (`d:\Projects\toys`).
+
+- Run build even when no files were changed
+- If build fails, fix errors before ending the turn
+- Do not skip build because the task was small or read-only
+- Dev server (`npm run dev`) may run in parallel; build uses `.next` separately

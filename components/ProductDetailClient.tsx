@@ -10,7 +10,6 @@ import {
   Plus,
   RotateCcw,
   ShieldCheck,
-  ShoppingCart,
   Star,
   Truck
 } from "lucide-react";
@@ -20,6 +19,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSplitColumnScroll } from "@/hooks/useSplitColumnScroll";
 import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { formatPrice, getProductVariants, products, type Product } from "@/lib/products";
+import { AddToCartButton } from "./AddToCartButton";
 import { useAnnounce } from "./LiveRegion";
 import { useRouteTransition } from "./PageTransition";
 import { useCart } from "./CartProvider";
@@ -76,16 +76,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     });
   };
 
-  const addQuantityToCart = () => {
-    for (let index = 0; index < quantity; index += 1) {
-      addToCart(product);
-    }
-  };
-
   const buyNow = () => {
-    for (let index = 0; index < quantity; index += 1) {
-      addToCart(product, { openDrawer: false });
-    }
+    addToCart(product, { quantity, openDrawer: false });
     navigate("/checkout");
   };
 
@@ -263,10 +255,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             </div>
 
             <div className="detail-actions">
-              <button className="detail-cart-button" type="button" onClick={addQuantityToCart}>
-                <ShoppingCart size={18} />
-                Add to cart
-              </button>
+              <AddToCartButton
+                className="detail-cart-button"
+                label="Add to cart"
+                product={product}
+                quantity={quantity}
+                variant="full"
+              />
               <button className="detail-buy-button" type="button" onClick={buyNow}>
                 Buy now
               </button>
@@ -364,14 +359,13 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           <span>{formatPrice(product.price)}</span>
           <small>{product.stockStatus}</small>
         </div>
-        <button
-          aria-label={`Add ${product.name} to cart`}
-          onClick={addQuantityToCart}
-          type="button"
-        >
-          <ShoppingCart size={18} />
-          <span>Add to cart</span>
-        </button>
+        <AddToCartButton
+          className="mobile-buy-bar-add"
+          label="Add to cart"
+          product={product}
+          quantity={quantity}
+          variant="full"
+        />
         <button aria-label={`Buy ${product.name} now`} onClick={buyNow} type="button">
           <span>Buy now</span>
         </button>

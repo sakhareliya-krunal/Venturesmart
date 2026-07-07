@@ -6,6 +6,7 @@ import { useAnnounce } from "./LiveRegion";
 
 type AddToCartOptions = {
   openDrawer?: boolean;
+  quantity?: number;
 };
 
 type CartContextValue = {
@@ -27,35 +28,48 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const announce = useAnnounce();
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("toyjoy-cart");
-    if (saved) {
-      setCart(JSON.parse(saved) as CartItem[]);
+    try {
+      const saved = window.localStorage.getItem("toyjoy-cart");
+      if (saved) {
+        setCart(JSON.parse(saved) as CartItem[]);
+      }
+    } catch {
+      window.localStorage.removeItem("toyjoy-cart");
     }
+    setIsHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
     window.localStorage.setItem("toyjoy-cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [cart, isHydrated]);
 
   const addToCart = (product: Product, options?: AddToCartOptions) => {
+    const quantity = Math.max(1, options?.quantity ?? 1);
+
     setCart((current) => {
       const existing = current.find((item) => item.id === product.id);
       if (existing) {
         return current.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...current, { ...product, quantity: 1 }];
+      return [...current, { ...product, quantity }];
     });
 
     const shouldOpenDrawer = options?.openDrawer !== false;
+    const label = quantity > 1 ? `${quantity} × ${product.name}` : product.name;
+
     if (shouldOpenDrawer) {
       setCartOpen(true);
     } else {
-      announce(`Added ${product.name} to cart`);
+      announce(`Added ${label} to cart`);
     }
   };
 

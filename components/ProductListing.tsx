@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDownUp, Eye, Search, ShoppingCart, SlidersHorizontal, Star } from "lucide-react";
+import { ArrowDownUp, Eye, Search, SlidersHorizontal, Star } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
@@ -12,10 +12,10 @@ import {
   type ProductCategory,
   type ProductVariantGroup
 } from "@/lib/products";
+import { AddToCartButton } from "./AddToCartButton";
 import { CustomDropdown } from "./CustomDropdown";
 import { FavouriteButton } from "./FavouriteButton";
 import { ScrollReveal } from "./ScrollReveal";
-import { useCart } from "./CartProvider";
 import { TransitionLink } from "./TransitionLink";
 
 type ProductListingProps = {
@@ -50,7 +50,6 @@ export function ProductListing({
   const [priceBand, setPriceBand] = useState("All");
   const [ratingBand, setRatingBand] = useState("All");
   const [sortMode, setSortMode] = useState("featured");
-  const { addToCart } = useCart();
   const priceOptions = ["All", "Under Rs 1,000", "Rs 1,000-3,000", "Above Rs 3,000"].map((option) => ({
     label: option,
     value: option
@@ -178,13 +177,7 @@ export function ProductListing({
 
       <div className="product-grid">
         {filteredProductGroups.map((group, index) => (
-          <ProductCard
-            delayIndex={index % 6}
-            group={group}
-            instant={isCatalogPage}
-            key={group.key}
-            onAddToCart={addToCart}
-          />
+          <ProductCard delayIndex={index % 6} group={group} instant={isCatalogPage} key={group.key} />
         ))}
       </div>
 
@@ -205,13 +198,11 @@ export function ProductListing({
 function ProductCard({
   delayIndex,
   group,
-  instant,
-  onAddToCart
+  instant
 }: {
   delayIndex: number;
   group: ProductVariantGroup;
   instant: boolean;
-  onAddToCart: (product: Product) => void;
 }) {
   const [selectedProduct, setSelectedProduct] = useState(group.product);
   const hasColorVariants = group.variants.length > 1;
@@ -237,19 +228,14 @@ function ProductCard({
           <strong>{discount}% off</strong>
         </div>
         <FavouriteButton className="product-favourite-corner" product={selectedProduct} />
+        <AddToCartButton className="product-cart-corner" product={selectedProduct} variant="icon" />
         <div className="product-image-overlay" aria-hidden="true" />
         <div className="product-hover-actions">
           <FavouriteButton product={selectedProduct} />
           <TransitionLink href={`/products/${selectedProduct.slug}`} aria-label={`View ${selectedProduct.name}`}>
             <Eye size={18} />
           </TransitionLink>
-          <button
-            aria-label={`Add ${selectedProduct.name} to cart`}
-            onClick={() => onAddToCart(selectedProduct)}
-            type="button"
-          >
-            <ShoppingCart size={18} />
-          </button>
+          <AddToCartButton product={selectedProduct} variant="icon" />
         </div>
       </div>
       <div className="product-info">
@@ -296,10 +282,7 @@ function ProductCard({
             <strong>{formatPrice(selectedProduct.price)}</strong>
             <span>{formatPrice(selectedProduct.mrp)}</span>
           </div>
-          <button onClick={() => onAddToCart(selectedProduct)} type="button">
-            <ShoppingCart size={18} />
-            Add
-          </button>
+          <AddToCartButton product={selectedProduct} variant="compact" label="Add" />
         </div>
       </div>
     </ScrollReveal>

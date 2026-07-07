@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getRecentlyViewedIds } from "@/lib/recently-viewed";
-import { formatPrice, type Product } from "@/lib/products";
-import { TransitionLink } from "./TransitionLink";
+import type { Product } from "@/lib/products";
+import { MiniProductCard } from "./MiniProductCard";
 
 type RecentlyViewedProps = {
   catalog: Product[];
@@ -40,16 +39,7 @@ export function RecentlyViewed({
       </div>
       <div className="mini-product-grid">
         {items.map((product) => (
-          <TransitionLink className="mini-product-card" href={`/products/${product.slug}`} key={product.id}>
-            <div className="mini-product-image">
-              <Image src={product.image} alt={product.name} fill sizes="108px" />
-            </div>
-            <div>
-              <span>{product.category}</span>
-              <strong>{product.name}</strong>
-              <small>{formatPrice(product.price)}</small>
-            </div>
-          </TransitionLink>
+          <MiniProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>
