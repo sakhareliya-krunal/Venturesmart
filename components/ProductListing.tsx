@@ -251,7 +251,6 @@ function ProductCard({
           <TransitionLink href={`/products/${selectedProduct.slug}`} aria-label={`View ${selectedProduct.name}`}>
             <Eye size={18} />
           </TransitionLink>
-          <AddToCartButton product={selectedProduct} variant="icon" />
         </div>
       </div>
       <div className="product-info">

@@ -1626,7 +1626,7 @@ a {
   bottom: 0;
   display: grid;
   gap: 6px;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   left: 0;
   opacity: 0;
   padding: 10px 8px;
@@ -1778,7 +1778,7 @@ a {
 @media (hover: none) and (max-width: 980px) {
   .product-hover-actions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     opacity: 1;
     transform: translateY(0);
   }
