@@ -14,7 +14,7 @@ export function MiniProductCard({ product }: MiniProductCardProps) {
     <article className="mini-product-card">
       <TransitionLink className="mini-product-card-link" href={`/products/${product.slug}`}>
         <div className="mini-product-image">
-          <Image src={product.image} alt={product.name} fill sizes="108px" />
+          <Image src={product.image} alt={product.name} fill sizes="(max-width: 720px) 80px, 108px" />
         </div>
         <div className="mini-product-copy">
           <span>{product.category}</span>

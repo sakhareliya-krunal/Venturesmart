@@ -111,14 +111,16 @@ export function StorefrontSections() {
       </section>
 
       <section className="section collection-rail">
-        <div className="rail-header">
-          <p className="eyebrow dark">Best sellers</p>
-          <h2>Popular picks</h2>
-        </div>
-        <div className="mini-product-grid">
-          {bestSellers.map((product) => (
-            <MiniProductCard key={product.id} product={product} />
-          ))}
+        <div className="collection-card">
+          <div className="rail-header">
+            <p className="eyebrow dark">Best sellers</p>
+            <h2>Popular picks</h2>
+          </div>
+          <div className="mini-product-grid">
+            {bestSellers.map((product) => (
+              <MiniProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -156,9 +158,23 @@ export function StorefrontSections() {
             <h2>Freshly added lunch boxes</h2>
           </div>
           {newArrivals.map((product) => (
-            <TransitionLink href={`/products/${product.slug}`} key={product.id}>
-              <span>{product.name}</span>
-              <strong>{formatPrice(product.price)}</strong>
+            <TransitionLink
+              className="collection-product-link"
+              href={`/products/${product.slug}`}
+              key={product.id}
+            >
+              <div className="collection-product-image">
+                <Image
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 720px) 64px, 72px"
+                  src={product.image}
+                />
+              </div>
+              <div className="collection-product-copy">
+                <span>{product.name}</span>
+                <strong>{formatPrice(product.price)}</strong>
+              </div>
             </TransitionLink>
           ))}
         </div>
@@ -168,9 +184,23 @@ export function StorefrontSections() {
             <h2>Highly rated picks</h2>
           </div>
           {trending.map((product) => (
-            <TransitionLink href={`/products/${product.slug}`} key={product.id}>
-              <span>{product.name}</span>
-              <strong>{product.rating} rating</strong>
+            <TransitionLink
+              className="collection-product-link"
+              href={`/products/${product.slug}`}
+              key={product.id}
+            >
+              <div className="collection-product-image">
+                <Image
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 720px) 64px, 72px"
+                  src={product.image}
+                />
+              </div>
+              <div className="collection-product-copy">
+                <span>{product.name}</span>
+                <strong>{product.rating} rating</strong>
+              </div>
             </TransitionLink>
           ))}
         </div>

@@ -2,14 +2,32 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent
+} from "react";
 import { heroSlides } from "@/lib/hero-slides";
 import { TransitionLink } from "./TransitionLink";
+
+const swipeThreshold = 52;
+const maxDragOffset = 72;
+const interactiveSelector = "a, button, input, select, textarea";
+
+function isInteractiveTarget(target: EventTarget | null) {
+  return target instanceof HTMLElement && Boolean(target.closest(interactiveSelector));
+}
 
 export function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const carouselRef = useRef<HTMLElement>(null);
@@ -46,12 +64,24 @@ export function HeroCarousel() {
     return () => window.clearInterval(intervalId);
   }, [goNext, paused, reducedMotion]);
 
-  const handleSwipeStart = (event: PointerEvent<HTMLDivElement>) => {
-    touchStartX.current = event.clientX;
-    touchStartY.current = event.clientY;
+  const resetSwipe = () => {
+    touchStartX.current = null;
+    touchStartY.current = null;
+    setDragOffset(0);
+    setIsDragging(false);
   };
 
-  const handleSwipeEnd = (event: PointerEvent<HTMLDivElement>) => {
+  const handleSwipeStart = (event: PointerEvent<HTMLDivElement>) => {
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    touchStartX.current = event.clientX;
+    touchStartY.current = event.clientY;
+    setIsDragging(true);
+  };
+
+  const handleSwipeMove = (event: PointerEvent<HTMLDivElement>) => {
     if (touchStartX.current === null || touchStartY.current === null) {
       return;
     }
@@ -59,7 +89,21 @@ export function HeroCarousel() {
     const diffX = event.clientX - touchStartX.current;
     const diffY = event.clientY - touchStartY.current;
 
-    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      setDragOffset(Math.max(-maxDragOffset, Math.min(maxDragOffset, diffX * 0.22)));
+    }
+  };
+
+  const handleSwipeEnd = (event: PointerEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null || touchStartY.current === null) {
+      resetSwipe();
+      return;
+    }
+
+    const diffX = event.clientX - touchStartX.current;
+    const diffY = event.clientY - touchStartY.current;
+
+    if (Math.abs(diffX) > swipeThreshold && Math.abs(diffX) > Math.abs(diffY)) {
       if (diffX < 0) {
         goNext();
       } else {
@@ -67,12 +111,7 @@ export function HeroCarousel() {
       }
     }
 
-    touchStartX.current = null;
-    touchStartY.current = null;
-  };
-
-  const stopSwipePropagation = (event: PointerEvent<HTMLDivElement>) => {
-    event.stopPropagation();
+    resetSwipe();
   };
 
   const handleCarouselKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -91,6 +130,7 @@ export function HeroCarousel() {
     <section
       ref={carouselRef}
       className="hero-carousel"
+      data-dragging={isDragging ? "true" : undefined}
       id="top"
       aria-roledescription="carousel"
       aria-label="Featured promotions"
@@ -105,13 +145,19 @@ export function HeroCarousel() {
             key={slide.title}
             className={index === activeIndex ? "hero-slide active" : "hero-slide"}
             aria-hidden={index !== activeIndex}
+            onPointerCancel={handleSwipeEnd}
+            onPointerDown={handleSwipeStart}
+            onPointerLeave={handleSwipeEnd}
+            onPointerMove={handleSwipeMove}
+            onPointerUp={handleSwipeEnd}
+            style={
+              index === activeIndex
+                ? ({ "--hero-drag-offset": `${dragOffset}px` } as CSSProperties)
+                : undefined
+            }
             {...(index !== activeIndex ? { inert: true } : {})}
           >
-            <div
-              className="hero-slide-media"
-              onPointerDown={handleSwipeStart}
-              onPointerUp={handleSwipeEnd}
-            >
+            <div className="hero-slide-media">
               <Image
                 src={slide.image}
                 alt=""
@@ -121,11 +167,7 @@ export function HeroCarousel() {
               />
               <div className="hero-slide-overlay" aria-hidden="true" />
             </div>
-            <div
-              className="hero-slide-copy"
-              onPointerDown={stopSwipePropagation}
-              onPointerUp={stopSwipePropagation}
-            >
+            <div className="hero-slide-copy">
               <p className="eyebrow">{slide.eyebrow}</p>
               <h1>{slide.title}</h1>
               <p>{slide.description}</p>

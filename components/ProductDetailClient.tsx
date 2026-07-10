@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import {
   BadgeCheck,
   Check,
-  ImagePlus,
   Minus,
   PackageCheck,
   Plus,
@@ -15,7 +13,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { FavouriteButton } from "@/components/FavouriteButton";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { MobileBuyBar } from "@/components/MobileBuyBar";
+import { ProductGallery } from "@/components/ProductGallery";
 import { useSplitColumnScroll } from "@/hooks/useSplitColumnScroll";
 import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import { formatPrice, getProductVariants, products, type Product } from "@/lib/products";
@@ -30,8 +29,6 @@ type ProductDetailClientProps = {
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(product.image);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [pincode, setPincode] = useState("");
   const [pincodeResult, setPincodeResult] = useState("");
   const topRef = useRef<HTMLDivElement>(null);
@@ -44,7 +41,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const gallery = product.gallery.length > 0 ? product.gallery : [product.image];
   const colorVariants = getProductVariants(product, products);
   const hasColorVariants = colorVariants.length > 1;
-  const isDesktopGallery = useMediaQuery("(min-width: 901px)");
 
   useSplitColumnScroll({
     containerRef: topRef,
@@ -85,62 +81,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     <section className="product-detail section page-section">
       <div className="product-detail-top" ref={topRef}>
         <div className="product-gallery-scroll" ref={galleryScrollRef}>
-          {isDesktopGallery ? (
-            <div className="product-gallery-desktop">
-              {gallery.map((image, index) => (
-                <div className="product-gallery-slide" key={`desktop-${image}-${index}`}>
-                  <Image
-                    src={image}
-                    alt={index === 0 ? product.name : `${product.name} view ${index + 1}`}
-                    fill
-                    priority={index === 0}
-                    loading={index === 0 ? undefined : "lazy"}
-                    fetchPriority={index === 0 ? "high" : "low"}
-                    sizes="(max-width: 980px) 100vw, 50vw"
-                  />
-                  {index === 0 && <span>{product.tag}</span>}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="product-gallery-mobile">
-              <div className="product-main-image">
-                <Image
-                  src={activeImage}
-                  alt={product.name}
-                  fill
-                  priority
-                  fetchPriority="high"
-                  sizes="(max-width: 980px) 100vw, 50vw"
-                />
-                <span>{product.tag}</span>
-                <FavouriteButton className="product-favourite-corner" product={product} />
-              </div>
-              <div className="product-thumbnail-row" aria-label="Product highlights">
-                {gallery.map((image, index) => (
-                  <button
-                    className={activeImageIndex === index ? "product-thumbnail active" : "product-thumbnail"}
-                    key={`${image}-${index}`}
-                    onClick={() => {
-                      setActiveImage(image);
-                      setActiveImageIndex(index);
-                    }}
-                    type="button"
-                    aria-label={`View product image ${index + 1}`}
-                  >
-                    <Image
-                      src={image}
-                      alt=""
-                      fill
-                      loading={index === 0 ? undefined : "lazy"}
-                      sizes="96px"
-                    />
-                    {index > 0 && <ImagePlus size={16} />}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <ProductGallery images={gallery} product={product} />
           <div className="gallery-note">
             <BadgeCheck size={18} />
             <span>Gallery images show the selected product and its matching detail views.</span>
@@ -263,7 +204,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 variant="full"
               />
               <button className="detail-buy-button" type="button" onClick={buyNow}>
-                Buy now
+                Order now
               </button>
               <FavouriteButton className="detail-save-button" product={product} />
             </div>
@@ -353,23 +294,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
       </div>
 
-      <div className="mobile-buy-bar" aria-label="Mobile purchase actions">
-        <div className="mobile-buy-bar-copy">
-          <strong className="mobile-buy-bar-title">{product.name}</strong>
-          <span>{formatPrice(product.price)}</span>
-          <small>{product.stockStatus}</small>
-        </div>
-        <AddToCartButton
-          className="mobile-buy-bar-add"
-          label="Add to cart"
-          product={product}
-          quantity={quantity}
-          variant="full"
-        />
-        <button aria-label={`Buy ${product.name} now`} onClick={buyNow} type="button">
-          <span>Buy now</span>
-        </button>
-      </div>
+      <MobileBuyBar onBuyNow={buyNow} product={product} quantity={quantity} />
     </section>
   );
 }

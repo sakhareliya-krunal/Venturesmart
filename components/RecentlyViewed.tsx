@@ -31,16 +31,16 @@ export function RecentlyViewed({
 
   return (
     <section className="section recently-viewed-section">
-      <div className="section-heading">
-        <div>
+      <div className="collection-card">
+        <div className="rail-header">
           <p className="eyebrow dark">{eyebrow}</p>
           <h2>{heading}</h2>
         </div>
-      </div>
-      <div className="mini-product-grid">
-        {items.map((product) => (
-          <MiniProductCard key={product.id} product={product} />
-        ))}
+        <div className="mini-product-grid">
+          {items.map((product) => (
+            <MiniProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </div>
     </section>
   );

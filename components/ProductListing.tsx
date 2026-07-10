@@ -26,6 +26,8 @@ type ProductListingProps = {
   showCategories?: boolean;
   showHeading?: boolean;
   initialCategory?: "All" | ProductCategory;
+  categoryOrder?: readonly ("All" | ProductCategory)[];
+  featuredCategoryOrder?: readonly ProductCategory[];
 };
 
 const catalogPaths = ["/shop", "/favourites"];
@@ -41,7 +43,9 @@ export function ProductListing({
   searchable = true,
   showCategories = true,
   showHeading = true,
-  initialCategory = "All"
+  initialCategory = "All",
+  categoryOrder = categories,
+  featuredCategoryOrder = []
 }: ProductListingProps) {
   const pathname = usePathname();
   const isCatalogPage = isCatalogPath(pathname);
@@ -81,6 +85,10 @@ export function ProductListing({
       return matchesCategory && matchesQuery && matchesPrice && matchesRating;
     });
 
+    const featuredCategoryRank = new Map(
+      featuredCategoryOrder.map((category, index) => [category, index])
+    );
+
     return [...result].sort((a, b) => {
       if (sortMode === "price-low") {
         return a.price - b.price;
@@ -94,9 +102,17 @@ export function ProductListing({
         return b.rating - a.rating;
       }
 
+      const categoryPriority =
+        (featuredCategoryRank.get(a.category) ?? Number.MAX_SAFE_INTEGER) -
+        (featuredCategoryRank.get(b.category) ?? Number.MAX_SAFE_INTEGER);
+
+      if (categoryPriority !== 0) {
+        return categoryPriority;
+      }
+
       return b.reviews - a.reviews;
     });
-  }, [activeCategory, items, priceBand, query, ratingBand, sortMode]);
+  }, [activeCategory, featuredCategoryOrder, items, priceBand, query, ratingBand, sortMode]);
 
   const filteredProductGroups = useMemo(() => groupProductVariants(productGroups), [productGroups]);
 
@@ -147,7 +163,7 @@ export function ProductListing({
       <div className="catalog-controls">
         {showCategories && (
           <div className="category-tabs" aria-label="Product categories">
-            {categories.map((category) => (
+            {categoryOrder.map((category) => (
               <button
                 key={category}
                 aria-pressed={activeCategory === category}

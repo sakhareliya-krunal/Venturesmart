@@ -4,8 +4,8 @@ export default function ProductLoading() {
       <section className="product-detail section page-section product-detail-skeleton" aria-busy="true" aria-label="Loading product">
         <div className="product-detail-top">
           <div className="product-gallery-scroll">
-            <div className="product-gallery-mobile">
-              <div className="skeleton-block product-main-image" />
+            <div className="product-gallery">
+              <div className="skeleton-block product-gallery-viewport" />
               <div className="product-thumbnail-row">
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div className="skeleton-block product-thumbnail" key={index} />

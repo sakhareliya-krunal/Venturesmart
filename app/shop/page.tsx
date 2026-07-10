@@ -7,6 +7,9 @@ export const metadata = {
   title: "Shop Products | Ventures Mart"
 };
 
+const shopCategoryOrder = ["All", "Lunch Box", "Toys"] as const;
+const shopFeaturedCategoryOrder = ["Lunch Box", "Toys"] as const;
+
 export default function ShopPage() {
   const catalogCategories = categories.filter((category) => category !== "All");
 
@@ -24,7 +27,13 @@ export default function ShopPage() {
         ]}
       />
       <PageContent id="catalog-products">
-        <ProductListing items={products} heading="Browse catalog" eyebrow="Filters & search" />
+        <ProductListing
+          categoryOrder={shopCategoryOrder}
+          eyebrow="Filters & search"
+          featuredCategoryOrder={shopFeaturedCategoryOrder}
+          heading="Browse catalog"
+          items={products}
+        />
       </PageContent>
     </main>
   );

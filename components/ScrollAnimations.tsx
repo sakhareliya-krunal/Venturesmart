@@ -28,15 +28,6 @@ const revealSelector = [
   ".footer-bottom"
 ].join(",");
 
-const catalogInstantSelector =
-  ".catalog-controls, .shop-toolbar, .empty-results";
-
-const catalogPaths = ["/shop", "/favourites"];
-
-function isCatalogPath(pathname: string) {
-  return catalogPaths.includes(pathname) || pathname.startsWith("/categories/");
-}
-
 function markInView(element: HTMLElement) {
   element.setAttribute("data-inview", "true");
 }
@@ -47,24 +38,37 @@ export function ScrollAnimations() {
   useEffect(() => {
     const mainContent = document.getElementById("main-content");
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const catalogPage = isCatalogPath(pathname);
     const elements = mainContent
       ? Array.from(mainContent.querySelectorAll<HTMLElement>(revealSelector))
       : Array.from(document.querySelectorAll<HTMLElement>(revealSelector));
 
     elements.forEach((element) => element.removeAttribute("data-inview"));
 
-    if (catalogPage) {
-      const catalogRoot = document.getElementById("catalog-products") ?? document.getElementById("page-content");
+    let autoScrollTimer: number | undefined;
 
-      if (catalogRoot) {
-        catalogRoot.querySelectorAll<HTMLElement>(catalogInstantSelector).forEach(markInView);
+    if (pathname !== "/") {
+      const target =
+        document.getElementById("catalog-products") ?? document.getElementById("page-content");
+
+      if (target) {
+        autoScrollTimer = window.setTimeout(() => {
+          target.scrollIntoView({
+            behavior: prefersReducedMotion ? "instant" : "smooth",
+            block: "start"
+          });
+        }, 700);
       }
     }
 
-    if (prefersReducedMotion) {
+    const clearAutoScroll = () => {
+      if (autoScrollTimer !== undefined) {
+        window.clearTimeout(autoScrollTimer);
+      }
+    };
+
+    if (prefersReducedMotion || !("IntersectionObserver" in window)) {
       elements.forEach(markInView);
-      return;
+      return clearAutoScroll;
     }
 
     const observer = new IntersectionObserver(
@@ -84,24 +88,9 @@ export function ScrollAnimations() {
 
     elements.forEach((element) => observer.observe(element));
 
-    let autoScrollTimer: number | undefined;
-
-    if (pathname !== "/" && !catalogPage) {
-      const target =
-        document.getElementById("catalog-products") ?? document.getElementById("page-content");
-
-      if (target) {
-        autoScrollTimer = window.setTimeout(() => {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 700);
-      }
-    }
-
     return () => {
       observer.disconnect();
-      if (autoScrollTimer !== undefined) {
-        window.clearTimeout(autoScrollTimer);
-      }
+      clearAutoScroll();
     };
   }, [pathname]);
 
