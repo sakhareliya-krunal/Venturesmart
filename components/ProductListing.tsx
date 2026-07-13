@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowDownUp, Eye, Search, SlidersHorizontal, Star } from "lucide-react";
+import { Eye, Search, SlidersHorizontal, Star } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   categories,
   formatPrice,
@@ -13,7 +13,7 @@ import {
   type ProductVariantGroup
 } from "@/lib/products";
 import { AddToCartButton } from "./AddToCartButton";
-import { CustomDropdown } from "./CustomDropdown";
+import { CatalogFilterDialog } from "./CatalogFilterDialog";
 import { FavouriteButton } from "./FavouriteButton";
 import { ScrollReveal } from "./ScrollReveal";
 import { TransitionLink } from "./TransitionLink";
@@ -36,6 +36,34 @@ function isCatalogPath(pathname: string) {
   return catalogPaths.includes(pathname) || pathname.startsWith("/categories/");
 }
 
+function countActiveFilters(
+  priceBand: string,
+  ratingBand: string,
+  sortMode: string,
+  activeCategory: string,
+  initialCategory: string
+) {
+  let count = 0;
+
+  if (activeCategory !== initialCategory) {
+    count += 1;
+  }
+
+  if (priceBand !== "All") {
+    count += 1;
+  }
+
+  if (ratingBand !== "All") {
+    count += 1;
+  }
+
+  if (sortMode !== "featured") {
+    count += 1;
+  }
+
+  return count;
+}
+
 export function ProductListing({
   items,
   heading = "Shop by category",
@@ -49,11 +77,14 @@ export function ProductListing({
 }: ProductListingProps) {
   const pathname = usePathname();
   const isCatalogPage = isCatalogPath(pathname);
+  const filterDialogId = useId();
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
   const [activeCategory, setActiveCategory] = useState<typeof initialCategory>(initialCategory);
   const [query, setQuery] = useState("");
   const [priceBand, setPriceBand] = useState("All");
   const [ratingBand, setRatingBand] = useState("All");
   const [sortMode, setSortMode] = useState("featured");
+  const [filterOpen, setFilterOpen] = useState(false);
   const priceOptions = ["All", "Under Rs 1,000", "Rs 1,000-3,000", "Above Rs 3,000"].map((option) => ({
     label: option,
     value: option
@@ -65,6 +96,13 @@ export function ProductListing({
     { label: "Price: low to high", value: "price-low" },
     { label: "Price: high to low", value: "price-high" }
   ];
+  const activeFilterCount = countActiveFilters(
+    priceBand,
+    ratingBand,
+    sortMode,
+    activeCategory,
+    initialCategory
+  );
 
   const productGroups = useMemo(() => {
     const result = items.filter((product) => {
@@ -124,14 +162,27 @@ export function ProductListing({
     setSortMode("featured");
   };
 
+  const closeFilterDialog = useCallback(() => {
+    setFilterOpen(false);
+    requestAnimationFrame(() => filterTriggerRef.current?.focus());
+  }, []);
+
+  const filterTriggerLabel =
+    activeFilterCount > 0 ? `Open filters, ${activeFilterCount} active` : "Open filters";
+
   return (
     <>
-      {showHeading && (
-        <ScrollReveal className="section-heading" delayIndex={0} instant={isCatalogPage}>
-          <div>
-            <p className="eyebrow dark">{eyebrow}</p>
-            <h2>{heading}</h2>
-          </div>
+      <div className="catalog-header">
+        {showHeading && (
+          <ScrollReveal className="section-heading catalog-header-copy" delayIndex={0} instant={isCatalogPage}>
+            <div>
+              <p className="eyebrow dark">{eyebrow}</p>
+              <h2>{heading}</h2>
+            </div>
+          </ScrollReveal>
+        )}
+
+        <div className={searchable ? "catalog-toolbar" : "catalog-toolbar catalog-toolbar-filter-only"}>
           {searchable && (
             <label className="search-box">
               <Search size={18} />
@@ -143,46 +194,46 @@ export function ProductListing({
               />
             </label>
           )}
-        </ScrollReveal>
-      )}
-
-      {!showHeading && searchable && (
-        <ScrollReveal className="section-heading section-heading-compact" delayIndex={0} instant={isCatalogPage}>
-          <label className="search-box">
-            <Search size={18} />
-            <input
-              aria-label="Search products"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search products or category"
-            />
-          </label>
-        </ScrollReveal>
-      )}
-
-      <div className="catalog-controls">
-        {showCategories && (
-          <div className="category-tabs" aria-label="Product categories">
-            {categoryOrder.map((category) => (
-              <button
-                key={category}
-                aria-pressed={activeCategory === category}
-                className={activeCategory === category ? "active" : ""}
-                onClick={() => setActiveCategory(category)}
-                type="button"
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="filter-panel" aria-label="Catalog filters">
-          <CustomDropdown icon={SlidersHorizontal} label="Price" options={priceOptions} value={priceBand} onChange={setPriceBand} />
-          <CustomDropdown icon={Star} label="Rating" options={ratingOptions} value={ratingBand} onChange={setRatingBand} />
-          <CustomDropdown icon={ArrowDownUp} label="Sort" options={sortOptions} value={sortMode} onChange={setSortMode} />
+          <button
+            ref={filterTriggerRef}
+            aria-controls={filterDialogId}
+            aria-expanded={filterOpen}
+            aria-haspopup="dialog"
+            aria-label={filterTriggerLabel}
+            className="catalog-filter-trigger"
+            onClick={() => setFilterOpen(true)}
+            type="button"
+          >
+            <SlidersHorizontal size={20} />
+            {activeFilterCount > 0 && (
+              <span aria-hidden="true" className="catalog-filter-badge">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
+
+      <CatalogFilterDialog
+        activeCategory={activeCategory}
+        categoryOrder={categoryOrder}
+        id={filterDialogId}
+        onCategoryChange={setActiveCategory}
+        onClose={closeFilterDialog}
+        onPriceBandChange={setPriceBand}
+        onRatingBandChange={setRatingBand}
+        onReset={resetFilters}
+        onSortModeChange={setSortMode}
+        open={filterOpen}
+        priceBand={priceBand}
+        priceOptions={priceOptions}
+        ratingBand={ratingBand}
+        ratingOptions={ratingOptions}
+        resultCount={filteredProductGroups.length}
+        showCategories={showCategories}
+        sortMode={sortMode}
+        sortOptions={sortOptions}
+      />
 
       <div className="shop-toolbar">
         <span>
@@ -244,7 +295,6 @@ function ProductCard({
           <strong>{discount}% off</strong>
         </div>
         <FavouriteButton className="product-favourite-corner" product={selectedProduct} />
-        <AddToCartButton className="product-cart-corner" product={selectedProduct} variant="icon" />
         <div className="product-image-overlay" aria-hidden="true" />
         <div className="product-hover-actions">
           <FavouriteButton product={selectedProduct} />

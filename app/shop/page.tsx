@@ -21,9 +21,9 @@ export default function ShopPage() {
         description="Browse toys and lunch boxes with filters and search."
         variant="catalog"
         stats={[
-          { value: `${products.length}`, label: "Curated products" },
-          { value: `${catalogCategories.length}`, label: "Shopping categories" },
-          { value: "Rs 999+", label: "Free delivery threshold" }
+          { value: `${products.length}`, label: "Products" },
+          { value: `${catalogCategories.length}`, label: "Categories" },
+          { value: "Rs 999+", label: "Free delivery" }
         ]}
       />
       <PageContent id="catalog-products">
@@ -33,6 +33,7 @@ export default function ShopPage() {
           featuredCategoryOrder={shopFeaturedCategoryOrder}
           heading="Browse catalog"
           items={products}
+          showHeading={false}
         />
       </PageContent>
     </main>

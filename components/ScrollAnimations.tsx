@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 const revealSelector = [
   ".inner-hero",
-  ".hero-carousel .hero-slide-copy > *",
   ".trust-strip > div",
   ".section-heading",
   ".section-action",
@@ -47,10 +46,11 @@ export function ScrollAnimations() {
     let autoScrollTimer: number | undefined;
 
     if (pathname !== "/") {
+      const isMobileViewport = window.matchMedia("(max-width: 900px)").matches;
       const target =
         document.getElementById("catalog-products") ?? document.getElementById("page-content");
 
-      if (target) {
+      if (target && !isMobileViewport) {
         autoScrollTimer = window.setTimeout(() => {
           target.scrollIntoView({
             behavior: prefersReducedMotion ? "instant" : "smooth",
